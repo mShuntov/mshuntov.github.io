@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-11-10T15:40:35+00:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Marko Shuntov</title><subtitle>PhD in Astrophysics</subtitle><author><name>Marko Shuntov</name><email>markoshuntov@gmail.com</email></author><entry><title type="html">Find the best midfilder for Man Utd in 2025/2026</title><link href="http://localhost:4000/posts/2025/10/manutd-midfield-2526/" rel="alternate" type="text/html" title="Find the best midfilder for Man Utd in 2025/2026" /><published>2025-10-20T00:00:00+00:00</published><updated>2025-10-20T00:00:00+00:00</updated><id>http://localhost:4000/posts/2025/10/manutd-midfield-2526</id><content type="html" xml:base="http://localhost:4000/posts/2025/10/manutd-midfield-2526/"><![CDATA[In this post, we will try to fix Manchester United's midfield problems in the 2025/2026 season.
+
+What are we missing in the midfield?
+======
+
+How can we find the right player profile
+======
+
+Do some analytics magic.
+------]]></content><author><name>Marko Shuntov</name><email>markoshuntov@gmail.com</email></author><category term="cool posts" /><category term="category1" /><category term="category2" /><summary type="html"><![CDATA[In this post, we will try to fix Manchester United’s midfield problems in the 2025/2026 season.]]></summary></entry><entry><title type="html">Shot map of your fave game last weekend</title><link href="http://localhost:4000/posts/2025/10/shotmap/" rel="alternate" type="text/html" title="Shot map of your fave game last weekend" /><published>2025-10-20T00:00:00+00:00</published><updated>2025-10-20T00:00:00+00:00</updated><id>http://localhost:4000/posts/2025/10/shotmap</id><content type="html" xml:base="http://localhost:4000/posts/2025/10/shotmap/"><![CDATA[You've watched a great derby last weekend in which your favourite team had tons of shots on goal, but so did the opponent. In this blog we will write a script that will plot a map of all shots taken during the game.
+
+The shot map
+======
+
+Python code
+======
+
+```
+import soccerdata as sd
+```
+
+------]]></content><author><name>Marko Shuntov</name><email>markoshuntov@gmail.com</email></author><category term="cool posts" /><category term="category1" /><category term="category2" /><summary type="html"><![CDATA[You’ve watched a great derby last weekend in which your favourite team had tons of shots on goal, but so did the opponent. In this blog we will write a script that will plot a map of all shots taken during the game.]]></summary></entry></feed>
