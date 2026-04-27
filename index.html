@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Marko Shuntov — Astrophysicist, Niels Bohr Institute</title>
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png">
+<link rel="manifest" href="images/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Geist:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* =======================================================================
+     Tweak defaults — editable via the Tweaks panel
+     ======================================================================= */
+  /* (script below reads window.__TWEAKS) */
+</style>
+<script>
+  const TWEAKS = /*EDITMODE-BEGIN*/{
+    "theme": "classical",
+    "serifFamily": "EB Garamond",
+    "showSidenotes": true,
+    "accent": "sepia",
+    "density": "generous"
+  }/*EDITMODE-END*/;
+  window.__TWEAKS = TWEAKS;
+</script>
+<style>
+  :root {
+    /* Classical (default) — cream + sepia */
+    --bg: #faf6ee;
+    --surface: #f3ecdd;
+    --rule: #d9cfb9;
+    --ink: #2b241b;
+    --ink-soft: #5a4f3e;
+    --ink-muted: #8a7e69;
+    --accent: #8a4b2a;           /* sepia */
+    --accent-soft: #c28a5e;
+    --link-under: #c7a97a;
+    --mark: #f2e3b8;
+    --serif: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+    --serif-display: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --measure: 34rem;
+    --sidenote: 16rem;
+    --gutter: 3rem;
+    --leading-body: 1.55;
+    --pad-section: 5.5rem;
+  }
+
+  [data-theme="editorial-dark"] {
+    --bg: #141210;
+    --surface: #1c1916;
+    --rule: #2e2a24;
+    --ink: #ece6d6;
+    --ink-soft: #b8ae99;
+    --ink-muted: #7a7160;
+    --accent: #d9a86c;
+    --accent-soft: #a47a4a;
+    --link-under: #6b5a3e;
+    --mark: #3c331e;
+  }
+
+  [data-theme="hairline-sepia"] {
+    --bg: #f2ead9;
+    --surface: #ebe1cb;
+    --rule: #cdbf9f;
+    --ink: #2d2415;
+    --ink-soft: #5f4f33;
+    --ink-muted: #8f7e5c;
+    --accent: #6d3b1f;
+    --accent-soft: #a86a3f;
+    --link-under: #b8986a;
+    --mark: #e2d2a2;
+  }
+
+  [data-serif="Geist"] { --serif: 'Geist', ui-sans-serif, system-ui, sans-serif; --serif-display: 'Geist', ui-sans-serif, system-ui, sans-serif; }
+  [data-serif="Space Grotesk"] { --serif: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; --serif-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif; }
+  [data-serif="Inter Tight"] { --serif: 'Inter Tight', ui-sans-serif, system-ui, sans-serif; --serif-display: 'Inter Tight', ui-sans-serif, system-ui, sans-serif; }
+  [data-serif="EB Garamond"] { --serif: 'EB Garamond', 'Iowan Old Style', Georgia, serif; --serif-display: 'EB Garamond', 'Iowan Old Style', Georgia, serif; }
+
+  [data-density="compact"] { --pad-section: 3.5rem; --leading-body: 1.45; }
+  [data-density="airy"] { --pad-section: 7.5rem; --leading-body: 1.65; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { background: var(--bg); }
+  body {
+    font-family: var(--serif);
+    font-size: 19px;
+    line-height: var(--leading-body);
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern", "liga", "onum";
+  }
+
+  ::selection { background: var(--mark); color: var(--ink); }
+
+  a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--link-under); transition: color .15s, border-color .15s, background .15s; }
+  a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .mono { font-family: var(--mono); font-size: 0.78em; letter-spacing: 0.02em; }
+  .small-caps { font-variant: small-caps; letter-spacing: 0.12em; font-weight: 500; }
+  .muted { color: var(--ink-muted); }
+  .soft { color: var(--ink-soft); }
+
+  /* Page frame ---------------------------------------------------------- */
+  .page {
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: 3rem 2.25rem 6rem;
+    position: relative;
+  }
+
+  /* Top ledger */
+  .ledger {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 4rem;
+  }
+  .ledger .mark {
+    font-family: var(--serif-display);
+    font-size: 1.15rem;
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  .ledger nav {
+    display: flex;
+    gap: 1.75rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+  }
+  .ledger nav a { border-bottom: none; padding-bottom: 2px; }
+  .ledger nav a:hover { border-bottom: 1px solid var(--accent); color: var(--accent); }
+
+  /* Two-column (body + sidenote) layout ---------------------------------- */
+  .col {
+    display: grid;
+    grid-template-columns: var(--measure) var(--sidenote);
+    gap: var(--gutter);
+    margin-bottom: var(--pad-section);
+  }
+  .col > .body { min-width: 0; }
+  .col > .aside {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: var(--ink-muted);
+    letter-spacing: 0.02em;
+    padding-top: 0.5rem;
+  }
+  .col > .aside .label {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    margin-bottom: 0.4rem;
+  }
+  .col > .aside .entry { margin-bottom: 1rem; }
+  [data-sidenotes="off"] .col > .aside { display: none; }
+  [data-sidenotes="off"] .col { grid-template-columns: var(--measure); }
+
+  @media (max-width: 980px) {
+    .col { grid-template-columns: 1fr; }
+    .col > .aside { border-left: 2px solid var(--rule); padding: 0.5rem 0 0.5rem 1rem; }
+  }
+
+  /* Hero ----------------------------------------------------------------- */
+  .hero {
+    display: grid;
+    grid-template-columns: var(--measure) var(--sidenote);
+    gap: var(--gutter);
+    margin-bottom: var(--pad-section);
+    align-items: start;
+  }
+  .hero h1 {
+    font-family: var(--serif-display);
+    font-weight: 500;
+    font-size: clamp(2.6rem, 5.2vw, 4.4rem);
+    line-height: 1.02;
+    margin: 0 0 1.75rem;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .hero .kicker {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    color: var(--ink-soft);
+    margin-bottom: 1.25rem;
+  }
+  .hero p.dek {
+    font-size: 1.15rem;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 30rem;
+    margin: 0 0 2rem;
+    text-wrap: pretty;
+  }
+  .hero .dek em { color: var(--ink); font-style: italic; }
+
+  .portrait {
+    width: 11rem;
+    height: 14rem;
+    background:
+      repeating-linear-gradient(135deg, var(--rule) 0 1px, transparent 1px 9px),
+      var(--surface);
+    border: 1px solid var(--rule);
+    display: flex;
+    align-items: flex-end;
+    padding: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .hero .aside-stack > div {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px dotted var(--rule);
+  }
+  .hero .aside-stack > div:last-child { border-bottom: none; }
+
+  /* Sections ------------------------------------------------------------- */
+  section { scroll-margin-top: 2rem; }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: var(--measure) var(--sidenote);
+    gap: var(--gutter);
+    margin-bottom: 2.25rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+  }
+  .section-head h2 {
+    font-family: var(--serif-display);
+    font-weight: 500;
+    font-size: 2rem;
+    line-height: 1.1;
+    margin: 0.8rem 0 0.3rem;
+    letter-spacing: -0.005em;
+  }
+  .section-head .num {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+  }
+  .section-head .note { align-self: end; padding-bottom: 0.3rem; }
+
+  /* Prose ---------------------------------------------------------------- */
+  .prose p { margin: 0 0 1.1em; text-wrap: pretty; }
+  .prose p.lead {
+    font-size: 1.3rem;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+  .prose p.lead::first-letter {
+    font-family: var(--serif-display);
+    float: left;
+    font-size: 3.4em;
+    line-height: 0.9;
+    padding: 0.08em 0.12em 0 0;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* Publications --------------------------------------------------------- */
+  .pubs { list-style: none; margin: 0; padding: 0; }
+  .pub {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 1rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    transition: background .2s ease;
+  }
+  .pub:first-child { border-top: 1px solid var(--rule); }
+  .pub:hover { background: color-mix(in oklab, var(--surface) 60%, transparent); }
+  .pub .year {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    padding-top: 0.28rem;
+  }
+  .pub .title {
+    font-family: var(--serif-display);
+    font-size: 1.18rem;
+    line-height: 1.28;
+    font-weight: 500;
+    margin: 0 0 0.35rem;
+    text-wrap: balance;
+    transition: color .2s;
+  }
+  .pub:hover .title { color: var(--accent); }
+  .pub .authors {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.35rem;
+    font-style: italic;
+  }
+  .pub .authors b { font-style: normal; font-weight: 500; color: var(--ink); border-bottom: 1px dotted var(--accent-soft); }
+  .pub .meta {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .pub .meta a { border-bottom: 1px solid var(--rule); padding-bottom: 1px; }
+  .pub .meta a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+  .pub .tag {
+    display: inline-block;
+    padding: 0 0.45rem;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    color: var(--ink-soft);
+  }
+
+  .pub-filter {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .pub-filter button {
+    background: none;
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    padding: 0.3rem 0.75rem;
+    cursor: pointer;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    border-radius: 2px;
+    transition: all .15s;
+  }
+  .pub-filter button:hover { border-color: var(--accent-soft); color: var(--ink); }
+  .pub-filter button.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* Feature strip — promoted interactives -------------------------------- */
+  .feature-strip {
+    max-width: calc(var(--measure) + var(--sidenote) + var(--gutter));
+    margin: 1rem 0 calc(var(--pad-section) - 1rem);
+  }
+  .feature-strip .fs-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0 0.85rem;
+    margin-bottom: 1.25rem;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .feature-strip .fs-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+  }
+  .feature-strip .fs-eyebrow .num { color: var(--accent); margin-right: 0.5rem; }
+  .feature-strip .fs-meta {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-muted);
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+  }
+  @media (max-width: 980px) {
+    .feature-grid { grid-template-columns: 1fr; }
+  }
+  .feature-card {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 1.6rem 1.6rem 1.4rem;
+    background: var(--bg);
+    color: var(--ink);
+    overflow: hidden;
+    isolation: isolate;
+    transition: background .2s;
+    border: none;
+  }
+  .feature-card + .feature-card { border-left: 1px solid var(--rule); }
+  @media (max-width: 980px) {
+    .feature-card + .feature-card { border-left: none; border-top: 1px solid var(--rule); }
+  }
+  .feature-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--fc-tint, transparent);
+    opacity: 0.5;
+    z-index: -1;
+    transition: opacity .25s;
+  }
+  .feature-card:hover::before { opacity: 0.95; }
+  .feature-card .fc-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.9rem;
+  }
+  .feature-card .fc-tag {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--fc-accent, var(--accent));
+    padding: 0.22rem 0.55rem;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    line-height: 1;
+  }
+  .feature-card .fc-time {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-muted);
+  }
+  .feature-card .fc-title {
+    font-family: var(--serif-display);
+    font-size: 1.85rem;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.012em;
+    margin: 0 0 0.55rem;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .feature-card .fc-title em {
+    color: var(--fc-accent, var(--accent));
+    font-style: italic;
+    font-weight: 500;
+  }
+  .feature-card .fc-desc {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0 0 1.2rem;
+    max-width: 32rem;
+  }
+  .feature-card .fc-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px dotted var(--rule);
+  }
+  .feature-card .fc-cta {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--fc-accent, var(--accent));
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: none;
+  }
+  .feature-card .fc-cta .arr { transition: transform .2s; display: inline-block; }
+  .feature-card:hover .fc-cta .arr { transform: translateX(4px); }
+  .feature-card .fc-bullets {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-muted);
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .feature-card .fc-bullets span + span::before { content: "· "; color: var(--rule); margin-right: 0.2rem; }
+  .feature-card.fc-essay { --fc-accent: var(--accent); --fc-tint: linear-gradient(135deg, rgba(138,75,42,0.10), transparent 65%); }
+  .feature-card.fc-sandbox { --fc-accent: #4f7bbd; --fc-tint: linear-gradient(135deg, rgba(79,123,189,0.12), transparent 65%); }
+  [data-theme="editorial-dark"] .feature-card.fc-sandbox { --fc-accent: #8ab6e8; --fc-tint: linear-gradient(135deg, rgba(138,182,232,0.14), transparent 65%); }
+  .feature-card .fc-thumb {
+    position: absolute;
+    right: -1.25rem;
+    bottom: -1.25rem;
+    width: 8rem;
+    height: 8rem;
+    opacity: 0.22;
+    pointer-events: none;
+    color: var(--fc-accent, var(--accent));
+    transition: opacity .25s;
+  }
+  .feature-card:hover .fc-thumb { opacity: 0.4; }
+  .feature-card .fc-thumb svg { width: 100%; height: 100%; display: block; }
+
+  /* Projects grid -------------------------------------------------------- */
+  .projects {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    border-left: 1px solid var(--rule);
+    max-width: calc(var(--measure) + var(--sidenote) + var(--gutter));
+  }
+  .project {
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 1.5rem 1.5rem 1.75rem;
+    display: block;
+    border-top: none;
+    border-left: none;
+    transition: background .2s;
+    position: relative;
+  }
+  .project:hover { background: var(--surface); border-bottom-color: var(--rule); }
+  .project .pname {
+    font-family: var(--serif-display);
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0 0 0.3rem;
+    letter-spacing: -0.005em;
+  }
+  .project .plang {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-muted);
+    margin-bottom: 0.75rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  .project .plang .dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .project .pdesc { color: var(--ink-soft); font-size: 0.98rem; line-height: 1.5; margin: 0; }
+  .project .parrow {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-family: var(--mono);
+    opacity: 0;
+    transition: opacity .2s, transform .2s;
+    color: var(--accent);
+  }
+  .project:hover .parrow { opacity: 1; transform: translateX(3px); }
+
+  /* Teaching ------------------------------------------------------------- */
+  .teaching { border-top: 1px solid var(--rule); }
+  .teach-row {
+    display: grid;
+    grid-template-columns: 6rem 1fr 8rem;
+    gap: 1.5rem;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+  }
+  .teach-row .when { font-family: var(--mono); font-size: 0.78rem; color: var(--ink-muted); }
+  .teach-row .what { font-family: var(--serif-display); font-size: 1.08rem; font-weight: 500; }
+  .teach-row .what .sub { display: block; font-family: var(--serif); font-weight: 400; font-size: 0.88rem; color: var(--ink-soft); font-style: italic; margin-top: 0.15rem; }
+  .teach-row .role { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-soft); text-align: right; }
+
+  /* CTA buttons ---------------------------------------------------------- */
+  .cta-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem; }
+  .btn {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    background: none;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all .15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .btn:hover { background: var(--ink); color: var(--bg); }
+  .btn.ghost { border-color: var(--rule); color: var(--ink-soft); }
+  .btn.ghost:hover { border-color: var(--ink); color: var(--ink); background: none; }
+
+  /* Footer --------------------------------------------------------------- */
+  footer.foot {
+    border-top: 1px solid var(--rule);
+    padding-top: 2.5rem;
+    margin-top: 6rem;
+    display: grid;
+    grid-template-columns: var(--measure) var(--sidenote);
+    gap: var(--gutter);
+  }
+  footer.foot .colophon {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    line-height: 1.6;
+  }
+  footer.foot .ornament {
+    font-family: var(--serif-display);
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--accent-soft);
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  /* Reveal animations ---------------------------------------------------- */
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity .8s ease, transform .8s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+
+  /* Tweaks panel --------------------------------------------------------- */
+  .tweaks {
+    position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 50;
+    background: var(--bg); border: 1px solid var(--rule);
+    padding: 1rem 1.15rem 1.1rem;
+    font-family: var(--mono); font-size: 0.72rem;
+    width: 16rem;
+    box-shadow: 0 14px 40px -12px rgba(40,30,10,0.18);
+    border-radius: 3px;
+    display: none;
+  }
+  .tweaks.on { display: block; }
+  .tweaks h3 {
+    margin: 0 0 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.66rem;
+    color: var(--ink-soft);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .tweaks h3 .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  .tweaks .group { margin-bottom: 0.8rem; }
+  .tweaks label { display: block; color: var(--ink-muted); margin-bottom: 0.3rem; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.6rem; }
+  .tweaks .seg {
+    display: flex; gap: 2px; border: 1px solid var(--rule); border-radius: 2px; overflow: hidden;
+  }
+  .tweaks .seg button {
+    flex: 1; background: none; border: none; padding: 0.4rem 0.2rem;
+    font: inherit; color: var(--ink-soft); cursor: pointer;
+    letter-spacing: 0.04em;
+  }
+  .tweaks .seg button.on { background: var(--ink); color: var(--bg); }
+  .tweaks .seg button:not(.on):hover { background: var(--surface); color: var(--ink); }
+  .tweaks .toggle { display: flex; justify-content: space-between; align-items: center; }
+
+  /* print / pdf ---------------------------------------------------------- */
+  @media print {
+    .tweaks { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page" id="page">
+
+  <!-- =============== LEDGER =============== -->
+  <header class="ledger">
+    <div class="mark">Marko Shuntov <span class="muted">— Astrophysicist</span></div>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#research">Research</a>
+      <a href="#publications">Publications</a>
+      <a href="#projects">Code</a>
+      <a href="#teaching">Teaching</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <!-- =============== HERO =============== -->
+  <section class="hero reveal" id="about">
+    <div class="body">
+      <div class="kicker">Cosmic Dawn Center · Niels Bohr Institute · University of Copenhagen</div>
+      <h1>On the intricate connection between <em>galaxies</em> and <em>dark matter</em> throughout cosmic history.</h1>
+      <p class="dek">
+        I'm a postdoctoral researcher at the <em>Cosmic Dawn Center</em> (DAWN)
+        at the Niels Bohr Institute. My work is in galaxy formation and evolution —
+        how galaxies assemble their stellar mass across cosmic history, and the
+        role of the underlying dark-matter structure in driving that evolution,
+        through large multi-band imaging surveys with
+        <span class="small-caps">JWST</span>, <span class="small-caps">Hubble</span>,
+        <span class="small-caps">Euclid</span> and <span class="small-caps">Roman</span>.
+      </p>
+      <div class="cta-row">
+        <a class="btn" href="#cv-download" id="cv">Download CV ↓</a>
+        <a class="btn ghost" href="#publications">Publications →</a>
+        <a class="btn ghost" href="mailto:markoshuntov@gmail.com">Email</a>
+      </div>
+    </div>
+    <aside class="aside aside-stack">
+      <div class="portrait" aria-label="portrait" style="position:relative;overflow:hidden;padding:0;">
+        <img src="images/profile.jpg" alt="Marko Shuntov" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
+      </div>
+      <div>
+        <span class="label">Position</span>
+        Postdoctoral researcher, Cosmic Dawn Center (DAWN) at the Niels Bohr Institute &amp; DTU Space. Copenhagen, Denmark.
+      </div>
+      <div>
+        <span class="label">Elsewhere</span>
+        <a href="https://scholar.google.com/citations?user=CipTnKAAAAAJ&amp;hl=en">Google Scholar</a><br/>
+        <a href="https://orcid.org/0000-0002-7087-0701">ORCID · 0000-0002-7087-0701</a><br/>
+        <a href="https://github.com/mShuntov">GitHub · @mShuntov</a><br/>
+        <a href="https://www.linkedin.com/in/marko-shuntov-a0303996">LinkedIn</a>
+      </div>
+    </aside>
+  </section>
+
+  <!-- =============== FEATURED INTERACTIVES =============== -->
+  <section class="feature-strip reveal" aria-label="Featured interactive pieces">
+    <div class="fs-head">
+      <div class="fs-eyebrow"><span class="num">¶</span>Explore the research, interactively</div>
+      <div class="fs-meta">2 pieces · runs in browser</div>
+    </div>
+    <div class="feature-grid">
+      <a href="galaxy-halo.html" class="feature-card fc-essay">
+        <div class="fc-row">
+          <span class="fc-tag">Essay</span>
+          <span class="fc-time">~6 min · scroll-driven</span>
+        </div>
+        <div>
+          <h3 class="fc-title">The <em>galaxy–halo</em> connection.</h3>
+          <p class="fc-desc">A scroll-driven tour of how I measure dark-matter halos from galaxy surveys — from photometry to clustering to the stellar-to-halo mass relation.</p>
+        </div>
+        <div class="fc-foot">
+          <span class="fc-cta">Read the essay <span class="arr">→</span></span>
+          <span class="fc-bullets"><span>SHMR</span><span>HOD</span><span>w(θ)</span></span>
+        </div>
+        <div class="fc-thumb" aria-hidden="true">
+          <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.2">
+            <circle cx="50" cy="50" r="42" stroke-dasharray="2 3" opacity="0.7"/>
+            <circle cx="50" cy="50" r="28" opacity="0.55"/>
+            <circle cx="50" cy="50" r="14" opacity="0.4"/>
+            <circle cx="50" cy="50" r="2.5" fill="currentColor" stroke="none"/>
+            <circle cx="72" cy="38" r="1.6" fill="currentColor" stroke="none"/>
+            <circle cx="34" cy="62" r="1.4" fill="currentColor" stroke="none"/>
+            <circle cx="58" cy="74" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="28" cy="36" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+      </a>
+      <a href="hod-sandbox.html" class="feature-card fc-sandbox">
+        <div class="fc-row">
+          <span class="fc-tag">Sandbox</span>
+          <span class="fc-time">interactive · live ξ(r)</span>
+        </div>
+        <div>
+          <h3 class="fc-title">The <em>HOD</em> sandbox.</h3>
+          <p class="fc-desc">Populate halos with galaxies, drag three knobs — <span class="mono" style="font-family:var(--mono);font-size:0.92em;">M_min</span>, <span class="mono" style="font-family:var(--mono);font-size:0.92em;">M₁</span>, <span class="mono" style="font-family:var(--mono);font-size:0.92em;">α</span> — and watch the two-point correlation function update in real time.</p>
+        </div>
+        <div class="fc-foot">
+          <span class="fc-cta">Open the sandbox <span class="arr">→</span></span>
+          <span class="fc-bullets"><span>Centrals</span><span>Satellites</span><span>ξ(r)</span></span>
+        </div>
+        <div class="fc-thumb" aria-hidden="true">
+          <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M10 80 Q30 20 90 18" opacity="0.85"/>
+            <path d="M10 86 Q35 40 90 30" opacity="0.5" stroke-dasharray="2 3"/>
+            <line x1="10" y1="92" x2="92" y2="92" opacity="0.4"/>
+            <line x1="10" y1="10" x2="10" y2="92" opacity="0.4"/>
+            <circle cx="22" cy="68" r="1.6" fill="currentColor" stroke="none"/>
+            <circle cx="38" cy="50" r="1.6" fill="currentColor" stroke="none"/>
+            <circle cx="58" cy="32" r="1.6" fill="currentColor" stroke="none"/>
+            <circle cx="78" cy="22" r="1.6" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- =============== RESEARCH =============== -->
+  <section id="research">
+    <div class="section-head reveal">
+      <div class="body">
+        <div class="num">§ 01 — Research</div>
+        <h2>How galaxies trace the cosmic web of dark matter.</h2>
+      </div>
+      <div class="aside note">
+        <span class="label">Current focus</span>
+        COSMOS-Web (JWST), Euclid, Roman, stellar-to-halo mass connection, galaxy clustering at <i>z &gt; 1</i>.
+      </div>
+    </div>
+
+    <div class="col reveal">
+      <div class="body prose">
+        <p class="lead">Galaxies are the lighthouses of cosmic structure. They live inside invisible halos of dark matter whose assembly is determined by gravity alone — and so by comparing <em>the galaxies we can see</em> with <em>the halos we can infer</em>, we can read the co-evolution of baryons and dark matter across thirteen billion years.</p>
+
+        <p>My work sits at the intersection of large extragalactic surveys and the statistical frameworks that turn photometry into physics. I led the production of the <a href="https://cosmos2025.iap.fr"><span class="small-caps">COSMOS2025</span></a> catalogue — photometry, morphology, redshifts and physical parameters for over 700,000 galaxies in the <span class="small-caps">COSMOS-Web</span> <span class="small-caps">JWST</span> survey — and develop open-source tools (<a href="https://github.com/mShuntov/halogal">halogal</a>) for modelling the galaxy–halo connection via stellar-to-halo mass relations, halo occupation distributions and abundance matching.</p>
+
+        <p>I'm increasingly interested in <em>simulation-based inference</em> and other machine-learning approaches to extragalactic statistics, and in pushing the galaxy–halo connection to the highest redshifts with <span class="small-caps">JWST</span>, <span class="small-caps">Euclid</span> and <span class="small-caps">Roman</span>.</p>
+      </div>
+      <aside class="aside">
+        <div class="entry"><span class="label">Methods</span>Bayesian SED fitting · Halo Occupation Distribution · Two-point statistics · Abundance matching · Simulation-based inference · ANN/CNN photo-z.</div>
+        <div class="entry"><span class="label">Software</span>SExtractor · SourceXtractor++ · PSFEx · LePHARE · CIGALE · eazy · Bagpipes · GalSim · grizli.</div>
+        <div class="entry"><span class="label">Collaborations</span>COSMOS-Web · Euclid · Roman · FRESCO · Cosmic Dawn Survey · DAWN-JWST Archive.</div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- =============== PUBLICATIONS =============== -->
+  <section id="publications">
+    <div class="section-head reveal">
+      <div class="body">
+        <div class="num">§ 02 — Selected Publications</div>
+        <h2>A brief catalogue of recent work.</h2>
+      </div>
+      <div class="aside note">
+        A complete, continually-updated list lives on
+        <a href="https://scholar.google.com/citations?user=CipTnKAAAAAJ&amp;hl=en">Google Scholar</a> and <a href="https://ui.adsabs.harvard.edu/search/q=author%3A%22shuntov%22&amp;sort=date%20desc">ADS</a>.
+      </div>
+    </div>
+
+    <div class="col reveal">
+      <div class="body">
+
+        <ol class="pubs" id="pubs">
+          <!-- populated by JS -->
+        </ol>
+      </div>
+      <aside class="aside">
+        <div class="entry"><span class="label">Preprints</span>Most recent work is on arXiv before journal publication.</div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- =============== PROJECTS =============== -->
+  <section id="projects">
+    <div class="section-head reveal">
+      <div class="body">
+        <div class="num">§ 03 — Code &amp; Data</div>
+        <h2>Open-source tools and data releases.</h2>
+      </div>
+      <div class="aside note">
+        Everything lives on <a href="#">github.com/mShuntov</a>.
+      </div>
+    </div>
+
+    <div class="col reveal">
+      <div class="body">
+        <div class="projects">
+          <a href="https://github.com/mShuntov/halogal" class="project">
+            <div class="pname">halogal</div>
+            <div class="plang"><span class="dot"></span> Python</div>
+            <p class="pdesc">Model predictions and fitting for galaxy–halo observables — UVLF, SMF, SFRD, stellar-mass density, two-point correlation functions and the stellar-to-halo mass relation, with MCMC fitting and tutorials.</p>
+            <span class="parrow mono">→</span>
+          </a>
+          <a href="https://cosmos2025.iap.fr" class="project">
+            <div class="pname">COSMOS2025 catalog</div>
+            <div class="plang"><span class="dot"></span> Data release</div>
+            <p class="pdesc">The official COSMOS-Web multi-band catalogue: photometry, morphology, photometric redshifts and physical parameters for 700,000+ galaxies across 37 bands, 0.3–8 μm.</p>
+            <span class="parrow mono">→</span>
+          </a>
+          <a href="https://github.com/mShuntov/SMF_in_COSMOS-Web_Shuntov2024" class="project">
+            <div class="pname">SMF_in_COSMOS-Web</div>
+            <div class="plang"><span class="dot"></span> Python · Notebooks</div>
+            <p class="pdesc">Stellar mass function measurements in COSMOS-Web, with Python notebook tutorials reproducing the paper figures.</p>
+            <span class="parrow mono">→</span>
+          </a>
+          <a href="https://github.com/mShuntov/SHMR_COSMOS2020" class="project">
+            <div class="pname">SHMR_COSMOS2020</div>
+            <div class="plang"><span class="dot"></span> Python</div>
+            <p class="pdesc">Stellar-to-halo mass measurements from COSMOS2020 — HOD modelling of clustering and abundance, fitting code, and release products.</p>
+            <span class="parrow mono">→</span>
+          </a>
+          <a href="https://dawn-cph.github.io/dja/blog/2024/08/16/morphological-data/" class="project">
+            <div class="pname">DAWN-JWST Archive morphologies</div>
+            <div class="plang"><span class="dot"></span> Data release</div>
+            <p class="pdesc">SourceXtractor++ morphological catalogues for 300,000+ galaxies across every major public JWST survey, hosted on the DAWN JWST Archive.</p>
+            <span class="parrow mono">→</span>
+          </a>
+          <a href="https://github.com/mShuntov" class="project">
+            <div class="pname">github.com/mShuntov</div>
+            <div class="plang"><span class="dot"></span> All repositories</div>
+            <p class="pdesc">Everything else — survey utilities, photo-z experiments, football-analytics side projects, and the source of this site.</p>
+            <span class="parrow mono">→</span>
+          </a>
+        </div>
+      </div>
+      <aside class="aside">
+        <div class="entry"><span class="label">License</span>Most repositories are MIT or BSD-3. Data releases follow the relevant collaboration policies.</div>
+        <div class="entry"><span class="label">Contributions</span>Issues and pull requests are welcome — reach out by email first for larger changes.</div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- =============== TEACHING =============== -->
+  <section id="teaching">
+    <div class="section-head reveal">
+      <div class="body">
+        <div class="num">§ 04 — Supervision</div>
+        <h2>Students and projects.</h2>
+      </div>
+      <div class="aside note">
+        Get in touch if you'd like to work on an extragalactic-surveys or galaxy–halo project at <span class="small-caps">NBI / DAWN</span>.
+      </div>
+    </div>
+
+    <div class="col reveal">
+      <div class="body">
+        <div class="teaching-note prose">
+          <p class="lead">I'm happy to discuss <b>Master's</b> and <b>Bachelor's</b> project supervision in extragalactic astrophysics — galaxy surveys, photometric catalogues, the galaxy–halo connection, and machine-learning methods applied to large-scale structure.</p>
+          <p>If you'd like to work on something in this space, send me a short note about your background and what excites you. I'm based at the Niels Bohr Institute / DAWN in Copenhagen.</p>
+        </div>
+      </div>
+      <aside class="aside">
+        <div class="entry"><span class="label">Where</span>Jagtvej 155 A, Niels Bohr Institute, Copenhagen.</div>
+        <div class="entry"><span class="label">How to reach out</span>A short email with your background and what draws you to the research is the best way to start.</div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- =============== CONTACT =============== -->
+  <section id="contact">
+    <div class="section-head reveal">
+      <div class="body">
+        <div class="num">§ 05 — Contact</div>
+        <h2>In correspondence.</h2>
+      </div>
+      <div class="aside note">
+        Fastest response via email. For press enquiries please also cc the
+        <a href="#">DAWN press office</a>.
+      </div>
+    </div>
+
+    <div class="col reveal">
+      <div class="body prose">
+        <p><b class="small-caps">Email.</b> <a href="mailto:markoshuntov@gmail.com">markoshuntov@gmail.com</a></p>
+        <p><b class="small-caps">Post.</b> Niels Bohr Institute, University of Copenhagen,<br/>Jagtvej 155 A, DK-2200 Copenhagen N, Denmark.</p>
+        <p><b class="small-caps">Also at.</b>
+          <a href="https://scholar.google.com/citations?user=CipTnKAAAAAJ&amp;hl=en">Google Scholar</a> ·
+          <a href="https://orcid.org/0000-0002-7087-0701">ORCID</a> ·
+          <a href="https://ui.adsabs.harvard.edu/search/q=author%3A%22shuntov%22&amp;sort=date%20desc">ADS</a> ·
+          <a href="https://github.com/mShuntov">GitHub</a> ·
+          <a href="https://www.linkedin.com/in/marko-shuntov-a0303996">LinkedIn</a>.
+        </p>
+      </div>
+      <aside class="aside">
+        <div class="entry"><span class="label">Time</span>Copenhagen (UTC+1 / +2).</div>
+        <div class="entry"><span class="label">Availability</span>Travelling autumn 2026 — see talks.</div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- =============== FOOTER =============== -->
+  <footer class="foot">
+    <div class="colophon">
+      <div class="ornament">※</div>
+      © 2026 Marko Shuntov. Set in <span id="font-name">EB Garamond</span> and JetBrains Mono.<br/>
+      Hand-written HTML &amp; CSS. No tracking, no cookies, no frameworks.<br/>
+      Last updated <span class="mono">2026-04-20</span>.
+    </div>
+    <div class="colophon">
+      <span class="label" style="display:block;text-transform:uppercase;letter-spacing:0.14em;color:var(--ink-soft);margin-bottom:0.4rem;">Colophon</span>
+      Structure borrowed from Edward Tufte's marginalia style,
+      with one column of body text and a narrower column of notes.
+    </div>
+  </footer>
+
+</div>
+
+<!-- Tweaks panel -->
+<div class="tweaks" id="tweaks" aria-hidden="true">
+  <h3>Tweaks <span class="dot"></span></h3>
+  <div class="group">
+    <label>Theme</label>
+    <div class="seg" data-key="theme">
+      <button data-v="classical">Classical</button>
+      <button data-v="editorial-dark">Dark</button>
+      <button data-v="hairline-sepia">Sepia</button>
+    </div>
+  </div>
+  <div class="group">
+    <label>Typeface</label>
+    <div class="seg" data-key="serifFamily">
+      <button data-v="Geist">Geist</button>
+      <button data-v="Space Grotesk">Grotesk</button>
+      <button data-v="Inter Tight">Inter</button>
+      <button data-v="EB Garamond">Serif</button>
+    </div>
+  </div>
+  <div class="group">
+    <label>Density</label>
+    <div class="seg" data-key="density">
+      <button data-v="compact">Compact</button>
+      <button data-v="generous">Generous</button>
+      <button data-v="airy">Airy</button>
+    </div>
+  </div>
+  <div class="group toggle">
+    <label style="margin:0">Sidenotes</label>
+    <div class="seg" data-key="showSidenotes" style="width:7rem">
+      <button data-v="true">On</button>
+      <button data-v="false">Off</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ---------- publications data ---------- */
+  const PUBS = [
+    {
+      year: 2026,
+      title: "The stellar mass function of quiescent and star-forming galaxies and its dependence on morphology in COSMOS-Web",
+      authors: ["<b>M. Shuntov</b>","O. Ilbert","C. del P. Lagos","S. Toft","F. Valentino","W. Mercier","et al."],
+      venue: "Astronomy &amp; Astrophysics",
+      vol: "707, A391",
+      tags: ["first"],
+      doi: "10.1051/0004-6361/202558022",
+      arxiv: "2511.05259",
+      bibcode: "2026A&A...707A.391S"
+    },
+    {
+      year: 2025,
+      title: "Constraints on the early Universe star formation efficiency from galaxy clustering and halo modeling of Hα and [O III] emitters",
+      authors: ["<b>M. Shuntov</b>","P. A. Oesch","S. Toft","R. A. Meyer","A. Covelo-Paz","L. Paquereau","et al."],
+      venue: "Astronomy &amp; Astrophysics",
+      vol: "699, A231",
+      tags: ["first"],
+      doi: "10.1051/0004-6361/202554618",
+      arxiv: "2503.14280",
+      bibcode: "2025A&A...699A.231S"
+    },
+    {
+      year: 2025,
+      title: "The COSMOS-Web ring: spectroscopic confirmation of the background source at z = 5.1",
+      authors: ["<b>M. Shuntov</b>","S. Jin","W. Mercier","J. S. Kartaltepe","R. Larson","A. A. Khostovan","R. Gavazzi","J. W. Nightingale","O. Ilbert","et al."],
+      venue: "Astronomy &amp; Astrophysics Letters",
+      vol: "696, L14",
+      tags: ["first"],
+      doi: "10.1051/0004-6361/202554273",
+      arxiv: "2502.20136",
+      bibcode: "2025A&A...696L..14S"
+    },
+    {
+      year: 2025,
+      title: "COSMOS-Web: Stellar mass assembly in relation to dark matter halos across 0.2 < z < 12 of cosmic history",
+      authors: ["<b>M. Shuntov</b>","H. J. McCracken","M. Franco","O. Ilbert","R. C. Arango-Toro","et al."],
+      venue: "Astronomy &amp; Astrophysics",
+      vol: "695, A20",
+      tags: ["first"],
+      doi: "10.1051/0004-6361/202452570",
+      arxiv: "2410.08290",
+      bibcode: "2025A&A...695A..20S"
+    },
+    {
+      year: 2025,
+      title: "COSMOS2025: The COSMOS-Web galaxy catalog of photometry, morphology, redshifts, and physical parameters from JWST, HST, and ground-based imaging",
+      authors: ["<b>M. Shuntov</b>","H. B. Akins","L. Paquereau","C. M. Casey","O. Ilbert","R. C. Arango-Toro","H. J. McCracken","M. Franco","et al."],
+      venue: "Astronomy &amp; Astrophysics",
+      vol: "704, A339",
+      tags: ["first"],
+      doi: "10.1051/0004-6361/202555799",
+      arxiv: "2506.03243",
+      bibcode: "2025A&A...704A.339S"
+    },
+    {
+      year: 2022,
+      title: "COSMOS2020: Cosmic evolution of the stellar-to-halo mass relation for central and satellite galaxies up to z ∼ 5",
+      authors: ["<b>M. Shuntov</b>","H. J. McCracken","R. Gavazzi","C. Laigle","J. R. Weaver","O. Ilbert","et al."],
+      venue: "Astronomy &amp; Astrophysics",
+      vol: "664, A61",
+      tags: ["first"],
+      doi: "10.1051/0004-6361/202243136",
+      arxiv: "2203.10895",
+      bibcode: "2022A&A...664A..61S"
+    },
+    {
+      year: 2020,
+      title: "PhotoWeb redshift: boosting photometric redshift accuracy with large spectroscopic surveys",
+      authors: ["<b>M. Shuntov</b>","S. Pasquet","S. Arnouts","O. Ilbert","M. Treyer","et al."],
+      venue: "Astronomy &amp; Astrophysics",
+      vol: "636, A90",
+      tags: ["first"],
+      doi: "10.1051/0004-6361/201937382",
+      arxiv: "2003.10766",
+      bibcode: "2020A&A...636A..90S"
+    }
+  ];
+
+  const pubsEl = document.getElementById('pubs');
+  function renderPubs(filter='all') {
+    pubsEl.innerHTML = PUBS
+      .filter(p => filter === 'all' || p.tags.includes(filter))
+      .map(p => `
+        <li class="pub" data-tags="${p.tags.join(' ')}">
+          <div class="year">${p.year}</div>
+          <div>
+            <h3 class="title">${p.title}</h3>
+            <div class="authors">${p.authors.join(', ')}</div>
+            <div class="meta">
+              <span>${p.venue}${p.vol ? ', ' + p.vol : ''}</span>
+              
+              ${p.doi ? `<a href="https://doi.org/${p.doi}" target="_blank" rel="noopener">doi</a>` : ''}
+              ${p.arxiv ? `<a href="https://arxiv.org/abs/${p.arxiv}" target="_blank" rel="noopener">arXiv</a>` : ''}
+              ${p.bibcode ? `<a href="https://ui.adsabs.harvard.edu/abs/${encodeURIComponent(p.bibcode)}/abstract" target="_blank" rel="noopener">ADS</a>` : ''}
+            </div>
+          </div>
+        </li>
+      `).join('');
+  }
+  renderPubs();
+
+  /* ---------- reveal on scroll ---------- */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal, .pub, .project, .teach-row').forEach(el => {
+    el.classList.add('reveal');
+    observer.observe(el);
+  });
+
+  /* ---------- tweak state ---------- */
+  function applyTweaks(t) {
+    const root = document.documentElement;
+    root.setAttribute('data-theme', t.theme || 'classical');
+    root.setAttribute('data-serif', t.serifFamily || 'EB Garamond');
+    root.setAttribute('data-density', t.density || 'generous');
+    root.setAttribute('data-sidenotes', (t.showSidenotes === false || t.showSidenotes === 'false') ? 'off' : 'on');
+    document.getElementById('font-name').textContent = t.serifFamily || 'EB Garamond';
+
+    // sync segment button highlights
+    document.querySelectorAll('.tweaks .seg').forEach(seg => {
+      const key = seg.dataset.key;
+      const v = String(t[key]);
+      seg.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+    });
+  }
+  applyTweaks(window.__TWEAKS);
+
+  document.querySelectorAll('.tweaks .seg button').forEach(b => {
+    b.addEventListener('click', () => {
+      const seg = b.closest('.seg');
+      const key = seg.dataset.key;
+      let v = b.dataset.v;
+      if (v === 'true') v = true;
+      if (v === 'false') v = false;
+      window.__TWEAKS[key] = v;
+      applyTweaks(window.__TWEAKS);
+      try {
+        window.parent.postMessage({type:'__edit_mode_set_keys', edits: { [key]: v }}, '*');
+      } catch(e){}
+    });
+  });
+
+  /* ---------- edit mode protocol ---------- */
+  window.addEventListener('message', (ev) => {
+    const d = ev.data || {};
+    if (d.type === '__activate_edit_mode') {
+      document.getElementById('tweaks').classList.add('on');
+    } else if (d.type === '__deactivate_edit_mode') {
+      document.getElementById('tweaks').classList.remove('on');
+    }
+  });
+  try { window.parent.postMessage({type:'__edit_mode_available'}, '*'); } catch(e){}
+</script>
+</body>
+</html>

@@ -1,0 +1,1189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>The Galaxy–Halo Connection · M. Shuntov</title>
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png">
+<link rel="manifest" href="images/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05060a;
+    --bg-soft: #0b0d14;
+    --ink: #ece6d6;
+    --ink-soft: #a39d8d;
+    --ink-muted: #6b6656;
+    --halo: #6fa8d6;         /* cool blue for dark matter */
+    --halo-soft: #2c4a6b;
+    --gal: #f2c46c;          /* warm yellow for stars */
+    --gal-hot: #ffe19a;
+    --gal-red: #c9713f;      /* quenched */
+    --accent: #d9a86c;
+    --rule: #1c1d26;
+    --serif: 'EB Garamond', 'Iowan Old Style', Georgia, serif;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern", "liga", "onum";
+  }
+
+  a { color: inherit; text-decoration: none; border-bottom: 1px solid #3a3428; transition: border-color .2s, color .2s; }
+  a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .mono { font-family: var(--mono); font-size: 0.82em; letter-spacing: 0.02em; }
+  .small-caps { font-variant: small-caps; letter-spacing: 0.12em; }
+  .label { font-family: var(--mono); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-muted); }
+
+  /* ========== STAGE ========== */
+  #stage {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  #canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* ========== SCROLLYTELLING ========== */
+  .page {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Top bar */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    background: linear-gradient(to bottom, rgba(5,6,10,0.85), rgba(5,6,10,0));
+    backdrop-filter: blur(6px);
+  }
+  .topbar a { border: none; }
+  .topbar a:hover { color: var(--accent); }
+  .topbar .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin: 0 0.6rem; vertical-align: middle; }
+
+  /* Intro */
+  .intro {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 8rem 2rem 4rem;
+    text-align: center;
+  }
+  .intro .kicker {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2rem;
+  }
+  .intro h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(2.4rem, 6vw, 4.4rem);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin: 0 0 1.5rem;
+    max-width: 22ch;
+    font-style: italic;
+  }
+  .intro h1 em { font-style: normal; color: var(--accent); }
+  .intro .sub {
+    max-width: 42ch;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    line-height: 1.55;
+    margin: 0 auto;
+  }
+  .intro .scroll-hint {
+    margin-top: 5rem;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 0.4 } 50% { opacity: 1 } }
+
+  /* Scenes: each scene is a tall section whose progress drives the canvas */
+  .scene {
+    min-height: 180vh;
+    position: relative;
+    padding: 0 2rem;
+  }
+  .scene .anchor {
+    position: sticky;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 38rem;
+    margin-left: 6vw;
+  }
+  .scene.right .anchor { margin-left: auto; margin-right: 6vw; }
+  .scene .card {
+    background: rgba(11, 13, 20, 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 2rem 2.2rem 2.2rem;
+    box-shadow: 0 30px 60px -30px rgba(0,0,0,0.7);
+  }
+  .scene .num {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+  }
+  .scene h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    letter-spacing: -0.005em;
+  }
+  .scene h2 em { color: var(--accent); font-style: italic; font-weight: 400; }
+  .scene p {
+    margin: 0 0 0.9rem;
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+    line-height: 1.6;
+  }
+  .scene p b { color: var(--ink); font-weight: 500; }
+  .scene p .star { color: var(--gal); font-style: italic; }
+  .scene p .halo-t { color: var(--halo); font-style: italic; }
+
+  .scene .readout {
+    margin-top: 1.4rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.4rem 1rem;
+  }
+  .scene .readout b { color: var(--ink); font-weight: 400; }
+
+  /* Controls overlay */
+  .controls {
+    position: fixed;
+    right: 2rem;
+    bottom: 2rem;
+    z-index: 40;
+    background: rgba(11, 13, 20, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--rule);
+    padding: 1rem 1.2rem;
+    border-radius: 2px;
+    min-width: 16rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .4s, transform .4s;
+  }
+  .controls.shown { opacity: 1; transform: translateY(0); }
+  .controls .label { margin-bottom: 0.4rem; display: block; }
+  .controls .row { display: flex; gap: 0.5rem; margin-bottom: 0.8rem; }
+  .controls .row:last-child { margin-bottom: 0; }
+  .controls button {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.5rem 0.4rem;
+    cursor: pointer;
+    transition: all .15s;
+    border-radius: 2px;
+  }
+  .controls button:hover { color: var(--ink); border-color: var(--ink-soft); }
+  .controls button.active { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+  .controls input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+  .controls .z-display {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--ink);
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.3rem;
+  }
+  .controls .z-display b { color: var(--accent); font-weight: 500; }
+
+  /* SHMR embedded plot overlay */
+  .shmr-overlay {
+    position: fixed;
+    left: 2rem;
+    bottom: 2rem;
+    z-index: 40;
+    background: rgba(11, 13, 20, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--rule);
+    padding: 1rem 1.2rem;
+    border-radius: 2px;
+    width: 22rem;
+    max-width: calc(100vw - 4rem);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .4s, transform .4s;
+  }
+  .shmr-overlay.shown { opacity: 1; transform: translateY(0); }
+  .shmr-overlay .cap {
+    font-family: var(--mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 0.4rem;
+  }
+  .shmr-overlay h4 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 1rem;
+    margin: 0 0 0.5rem;
+  }
+  .shmr-overlay svg { display: block; width: 100%; height: auto; }
+  .shmr-overlay .legend {
+    font-family: var(--mono);
+    font-size: 0.64rem;
+    color: var(--ink-muted);
+    margin-top: 0.4rem;
+    display: flex;
+    gap: 1rem;
+  }
+  .shmr-overlay .legend span::before {
+    content: '';
+    display: inline-block;
+    width: 10px; height: 2px;
+    background: currentColor;
+    margin-right: 0.3rem;
+    vertical-align: middle;
+  }
+  .shmr-overlay .legend .z-now { color: var(--accent); }
+  .shmr-overlay .legend .z-other { color: var(--ink-muted); }
+  .shmr-overlay .note { font-family: var(--serif); font-style: italic; color: var(--ink-muted); font-size: 0.82rem; margin-top: 0.3rem; }
+
+  /* Progress bar */
+  .progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: var(--accent);
+    width: 0%;
+    z-index: 60;
+    transition: width .05s linear;
+  }
+
+  /* Outro */
+  .outro {
+    min-height: 90vh;
+    display: grid;
+    place-items: center;
+    padding: 6rem 2rem;
+    text-align: center;
+  }
+  .outro h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    max-width: 28ch;
+    margin: 0 0 1.5rem;
+    line-height: 1.2;
+  }
+  .outro .refs {
+    margin-top: 3rem;
+    max-width: 36rem;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    border-top: 1px solid var(--rule);
+    padding-top: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+  .outro .refs ol { list-style: none; padding: 0; margin: 0; counter-reset: ref; }
+  .outro .refs li {
+    counter-increment: ref;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+  .outro .refs li::before {
+    content: '[' counter(ref) ']';
+    color: var(--accent);
+    margin-right: 0.6rem;
+  }
+  .outro .refs li a { color: var(--ink-soft); border-bottom: none; }
+  .outro .refs li a:hover { color: var(--accent); }
+  .outro .back {
+    display: inline-block;
+    margin-top: 3rem;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 0.8rem 1.4rem;
+    border-radius: 2px;
+    transition: all .2s;
+  }
+  .outro .back:hover { background: var(--accent); color: var(--bg); }
+
+  @media (max-width: 900px) {
+    .scene .anchor { margin-left: 0; margin-right: 0 !important; max-width: 100%; }
+    .controls, .shmr-overlay { left: 1rem; right: 1rem; bottom: 1rem; width: auto; }
+    .shmr-overlay { bottom: auto; top: 5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<nav class="topbar">
+  <a href="index.html">&larr; Marko Shuntov</a>
+  <div><span>The Galaxy–Halo Connection</span><span class="dot"></span><span>An interactive essay</span></div>
+</nav>
+
+<div id="stage"><canvas id="canvas" aria-hidden="true"></canvas></div>
+
+<main class="page">
+
+  <!-- =============== INTRO =============== -->
+  <section class="intro">
+    <div>
+      <div class="kicker">An interactive essay · scroll to begin</div>
+      <h1>Every galaxy you see is resting in a well of <em>something you can't</em>.</h1>
+      <p class="sub">A short, scroll-driven tour of the dark-matter scaffolding that
+        underpins the visible universe — and how we measure it with deep extragalactic surveys.</p>
+      <div class="scroll-hint">↓ scroll</div>
+    </div>
+  </section>
+
+  <!-- =============== SCENE 01 — DARK FIELD =============== -->
+  <section class="scene" id="s1" data-scene="1">
+    <div class="anchor">
+      <div class="card">
+        <div class="num">§ 01 — The Dark Scaffold</div>
+        <h2>First there were <em>halos</em>, and they were dark.</h2>
+        <p>Gravity doesn't care whether matter shines. In the first hundred million years
+           after the Big Bang, dark matter — five times more abundant than the ordinary
+           kind — collapsed into a web of self-gravitating knots called <b class="halo-t">halos</b>.</p>
+        <p>Each halo is a roughly spherical overdensity of dark matter, with a mass that
+           sets how deep its gravitational well runs. The bigger the halo, the deeper the well.</p>
+        <div class="readout">
+          <span class="mono">ΩDM · Ωb</span><b>0.27 · 0.05</b>
+          <span class="mono">halos on screen</span><b id="r-nhalo">—</b>
+          <span class="mono">mass range</span><b>10<sup>10</sup> – 10<sup>14</sup> M<sub>☉</sub></b>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============== SCENE 02 — BARYONS COOL =============== -->
+  <section class="scene right" id="s2" data-scene="2">
+    <div class="anchor">
+      <div class="card">
+        <div class="num">§ 02 — Baryons Fall In</div>
+        <h2>Then gas cooled, and <em>stars lit up</em>.</h2>
+        <p>Ordinary matter — hydrogen, helium, a sprinkle of everything else — fell into
+           those wells. When it cooled enough, it fragmented into stars. The stars formed
+           <b class="star">galaxies</b>, and the galaxies inherited the geography of their halos.</p>
+        <p>But the mapping is not one-to-one. A halo ten times more massive does <b>not</b>
+           host a galaxy ten times more massive — feedback from supernovae and supermassive
+           black holes makes the efficiency peak at a very particular halo mass.</p>
+        <div class="readout">
+          <span class="mono">galaxies lit</span><b id="r-ngal">—</b>
+          <span class="mono">peak M<sub>h</sub></span><b>≈ 10<sup>12</sup> M<sub>☉</sub></b>
+          <span class="mono">peak ε</span><b id="r-peak">—</b>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============== SCENE 03 — SHMR =============== -->
+  <section class="scene" id="s3" data-scene="3">
+    <div class="anchor">
+      <div class="card">
+        <div class="num">§ 03 — The Stellar-to-Halo Mass Relation</div>
+        <h2>The <em>SHMR</em> is the love letter between baryons and dark matter.</h2>
+        <p>Plot stellar mass <span class="star">M<sub>*</sub></span> against halo mass
+           <span class="halo-t">M<sub>h</sub></span> and you get a curve that bends at
+           <span class="halo-t">10<sup>12</sup> M<sub>☉</sub></span>. Below the peak,
+           supernova feedback blows gas out. Above the peak, AGN feedback shuts cooling down.</p>
+        <p>In <a href="https://doi.org/10.1051/0004-6361/202452570">Shuntov et al. (2025)</a>
+           we measured how this curve <b>evolves</b> from <i>z=0.2</i> to <i>z=12</i>
+           — the first coherent measurement spanning nearly the whole history of the Universe,
+           made possible by COSMOS-Web's JWST imaging.</p>
+        <div class="readout">
+          <span class="mono">redshift bins</span><b>10</b>
+          <span class="mono">survey</span><b>COSMOS-Web · 0.54 deg²</b>
+          <span class="mono">galaxies</span><b>≈ 700,000</b>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============== SCENE 04 — REDSHIFT SCRUBBER =============== -->
+  <section class="scene right" id="s4" data-scene="4">
+    <div class="anchor">
+      <div class="card">
+        <div class="num">§ 04 — Run the Clock</div>
+        <h2>Turn the redshift dial. The universe <em>re-paints itself</em>.</h2>
+        <p>Use the scrubber in the bottom right to change the redshift. As you move from
+           <i>z=0</i> backwards, halos shrink and merge back into smaller progenitors.
+           Stellar masses fall, and the peak of the SHMR migrates.</p>
+        <p>The evolution of the peak efficiency is <em>non-monotonic</em>:
+           it sits near <b>~20%</b> today, <em>dips</em> to <b>~6%</b> around <i>z ~ 1.5</i>,
+           recovers gently through cosmic noon, and then <em>rises again sharply</em> beyond
+           <i>z ~ 3.5</i> — reaching values as high as <b>50–100%</b> for ~10<sup>11.5</sup>
+           M<sub>☉</sub> halos in the first few hundred Myr (Shuntov+ 2025). The early
+           universe was a place where halos and galaxies grew almost in lockstep.</p>
+        <p>This is the kind of measurement that only becomes possible with surveys like
+           <b>COSMOS-Web</b> (JWST, 0.54 deg²) and <b>Euclid Q1</b>, which reach the faint,
+           high-redshift galaxies that populate small halos.</p>
+        <div class="readout">
+          <span class="mono">current z</span><b id="r-z">0.5</b>
+          <span class="mono">age of universe</span><b id="r-age">—</b>
+          <span class="mono">halo mass · peak</span><b id="r-peakmass">—</b>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============== SCENE 05 — CLUSTERING =============== -->
+  <section class="scene" id="s5" data-scene="5">
+    <div class="anchor">
+      <div class="card">
+        <div class="num">§ 05 — Two Galaxies, Not One</div>
+        <h2>Galaxies don't live alone. They <em>cluster</em>.</h2>
+        <p>Because massive halos are rarer, and form at the peaks of the dark-matter density
+           field, galaxies inside them are <b>more strongly clustered</b> than the dark matter itself.
+           The excess clustering — the "galaxy bias" — is a direct probe of which halos
+           host which galaxies.</p>
+        <p>We measure this through the <span class="mono">two-point correlation function</span>:
+           the excess probability, over random, of finding two galaxies separated by a given distance.
+           Comparing the measurement to a <b>Halo Occupation Distribution</b> model pins down
+           <i>M<sub>min</sub></i>, <i>M<sub>1</sub></i> and the satellite slope α — and the SHMR
+           drops out.</p>
+        <div class="readout">
+          <span class="mono">method</span><b>HOD + clustering + abundance</b>
+          <span class="mono">one-halo / two-halo</span><b>satellites / centrals</b>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============== OUTRO =============== -->
+  <section class="outro">
+    <h2>All of cosmic history, written in where galaxies sit and where they don't.</h2>
+    <p class="mono" style="color: var(--ink-muted); letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.72rem;">
+      Thanks for reading.
+    </p>
+
+    <div class="refs">
+      <div class="label" style="margin-bottom: 0.6rem;">Further reading</div>
+      <ol>
+        <li><a href="https://arxiv.org/abs/2410.08290">Shuntov et al. 2025 · COSMOS-Web: stellar mass assembly and halos, 0.2 &lt; z &lt; 12</a></li>
+        <li><a href="https://arxiv.org/abs/2506.03243">Shuntov et al. 2025 · COSMOS2025 catalogue</a></li>
+        <li><a href="https://arxiv.org/abs/2203.10895">Shuntov et al. 2022 · COSMOS2020 SHMR for centrals and satellites</a></li>
+        <li><a href="https://arxiv.org/abs/2503.14280">Shuntov et al. 2025 · Clustering of Hα and [O III] emitters</a></li>
+      </ol>
+    </div>
+
+    <a href="index.html" class="back">← Back to site</a>
+  </section>
+</main>
+
+<!-- ========== Redshift scrubber ========== -->
+<div class="controls" id="controls">
+  <span class="label">Run the clock</span>
+  <div class="z-display"><span>redshift</span><b id="z-val">0.5</b></div>
+  <input type="range" id="zslider" min="0.2" max="12" step="0.1" value="0.5"/>
+  <div class="row">
+    <button data-show="both" class="active">Both</button>
+    <button data-show="halos">DM only</button>
+    <button data-show="galaxies">Galaxies only</button>
+  </div>
+</div>
+
+<!-- ========== SHMR overlay (shown in scene 3+) ========== -->
+<div class="shmr-overlay" id="shmr-overlay">
+  <div class="cap">Figure · Shuntov+ 2025 SHMR, schematic</div>
+  <h4>Stellar-to-halo mass relation</h4>
+  <svg id="shmr-svg" viewBox="0 0 320 200" aria-label="SHMR plot">
+    <!-- axes drawn in JS -->
+  </svg>
+  <div class="legend">
+    <span class="z-now" id="lg-now">z = 0.5</span>
+    <span class="z-other">other z</span>
+  </div>
+</div>
+
+<script>
+/* ==================================================================
+   The Galaxy–Halo Connection — scroll-driven canvas + SHMR plot
+================================================================== */
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+function resize() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W * DPR;
+  canvas.height = H * DPR;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+/* ------------------------------------------------------------------
+   Generate a dark-matter halo field (Poisson-like with clustering)
+------------------------------------------------------------------ */
+function mulberry32(a) {
+  return function() {
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+}
+const rand = mulberry32(42);
+
+function randn() {
+  // Box–Muller
+  const u = Math.max(1e-9, rand()), v = rand();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+// Sample log10(Mh) from a Schechter-ish distribution:
+// heavy power law up to a knee, exponential cutoff.
+function sampleLogMh() {
+  // Inverse CDF approximation: heavy tail at low mass
+  const u = rand();
+  // simple: log10Mh ~ 10 + 4 * u^2.5 * tail factor — tuned to give a reasonable mix
+  const logM = 10 + 4.0 * Math.pow(u, 2.2) + 0.15 * randn();
+  return Math.min(14.2, Math.max(9.8, logM));
+}
+
+// Build a static set of halos in a unit square [0,1]^2
+const N_HALOS = 240;
+const halos = [];
+for (let i = 0; i < N_HALOS; i++) {
+  // 2D positions with mild clustering via offset around random seed centers
+  let x, y;
+  if (i < 10) { x = rand(); y = rand(); }
+  else {
+    const seed = halos[Math.floor(rand() * Math.min(halos.length, 12))];
+    x = seed.x0 + (rand() - 0.5) * 0.35;
+    y = seed.y0 + (rand() - 0.5) * 0.35;
+    // wrap
+    x = (x + 1) % 1;
+    y = (y + 1) % 1;
+  }
+  const logM = sampleLogMh();
+  halos.push({
+    x0: x, y0: y,
+    logMh0: logM,           // mass at z=0 (peak)
+    zform: 1 + rand() * 9,  // redshift at which this halo "exists" — lower = earlier formation
+    phase: rand() * Math.PI * 2,
+    jitter: 0.002 + rand() * 0.006,
+  });
+}
+
+/* ------------------------------------------------------------------
+   SHMR model (Behroozi-like, schematic)
+   Returns log10(Mstar/Mh) given log10(Mh), z
+------------------------------------------------------------------ */
+function shmrEfficiency(logMh, z) {
+  // --- Non-monotonic redshift evolution (Shuntov+ 2025, qualitatively) ---
+  // Peak SFE log10(eps):
+  //   high at z=0 (~20%, log ~ -0.7)
+  //   dips to a MINIMUM around z~1.5 (~6%, log ~ -1.2)
+  //   slowly rises to z~3.5 (~8%, log ~ -1.1)
+  //   sharp rise after z~3.5, approaching ε~0.5-1 at z>8 (log ~ -0.3 to 0)
+  // Parameterize as piecewise-smooth with a Gaussian dip at z~1.5 + a logistic at z~3.5.
+  const dip = -0.45 * Math.exp(-Math.pow((z - 1.5) / 1.2, 2));        // pulls down around z=1.5
+  const earlyRise = 0.75 / (1 + Math.exp(-(z - 4.5) * 0.9));           // switches on after z~4
+  let epsPeak = -0.55 + dip + earlyRise;                               // log10(eps) at the peak
+  epsPeak = Math.min(epsPeak, -0.05);                                  // cap below 100% M*/Mh
+
+  // Peak halo mass: ~10^12.2 at z=0, migrates to lower Mh at high z (downsizing signature);
+  // not strictly monotonic — mild plateau then drop.
+  const logM1 = 12.20
+              - 0.05 * Math.max(0, z - 0.3)                            // slow low-z drift
+              - 0.35 / (1 + Math.exp(-(z - 4) * 0.7));                 // faster drop after z~4
+
+  // double power law peak function (simple)
+  const dx = logMh - logM1;
+  // width params
+  const alpha = 2.2; // low mass slope
+  const beta = 0.6;  // high mass slope
+  const gamma = 0.8;
+  // approximate double-power: epsPeak - log10( (1+10^(alpha*(-dx)))*(1+10^(beta*dx)) )/gamma
+  const f = epsPeak - Math.log10(Math.pow(10, alpha * (-dx)) + Math.pow(10, beta * dx)) / gamma;
+  return f; // log10(M*/Mh)
+}
+
+function shmrStellarMass(logMh, z) {
+  return logMh + shmrEfficiency(logMh, z);
+}
+
+// Halo "exists" at redshift z if zform > z (i.e. formed before z). Also shrink with z.
+// Use a growth factor D(z) such that Mh(z) = Mh(0) * exp(-0.4*z) (crude)
+function haloMassAtZ(h, z) {
+  if (z > h.zform) return 0; // not yet collapsed
+  return h.logMh0 + Math.log10(Math.exp(-0.35 * z));
+}
+
+/* ------------------------------------------------------------------
+   Rendering
+------------------------------------------------------------------ */
+const state = {
+  z: 0.5,
+  scene: 0,          // 0..5
+  sceneProg: 0,      // within-scene progress 0..1
+  globalProg: 0,     // overall scroll progress 0..1
+  show: 'both',      // 'halos' | 'galaxies' | 'both'
+  haloAlpha: 1,
+  galAlpha: 1,
+  t: 0,
+};
+
+// Cosmos-Web-style color palette
+const COL = {
+  halo: [111, 168, 214],      // cool blue
+  haloCore: [70, 120, 180],
+  gal: [242, 196, 108],       // warm yellow
+  galHot: [255, 225, 155],
+  galRed: [201, 113, 63],     // quenched
+  star: [255, 240, 210],
+};
+
+function rgba(c, a) { return `rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`; }
+
+function draw() {
+  const w = W, h = H;
+
+  // background radial haze
+  ctx.clearRect(0, 0, w, h);
+  const bg = ctx.createRadialGradient(w * 0.55, h * 0.45, 10, w * 0.55, h * 0.45, Math.max(w, h) * 0.8);
+  bg.addColorStop(0, 'rgba(22,24,38,1)');
+  bg.addColorStop(0.6, 'rgba(10,11,18,1)');
+  bg.addColorStop(1, 'rgba(5,6,10,1)');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, w, h);
+
+  // subtle starfield
+  ctx.save();
+  for (let i = 0; i < 80; i++) {
+    const r = rand();  // deterministic-ish because mulberry still seeded
+    // use a different seed each frame — instead compute from indices
+  }
+  ctx.restore();
+
+  // Compute viewport field rectangle (center area, leave edges for text)
+  const pad = Math.min(w, h) * 0.04;
+  const fieldW = w - pad * 2;
+  const fieldH = h - pad * 2;
+  const ox = pad, oy = pad;
+
+  // Twinkle stars (background)
+  ctx.save();
+  ctx.globalAlpha = 0.4;
+  const starSeed = mulberry32(7);
+  for (let i = 0; i < 160; i++) {
+    const sx = starSeed() * w;
+    const sy = starSeed() * h;
+    const sr = starSeed() * 0.9 + 0.2;
+    const flick = 0.5 + 0.5 * Math.sin(state.t * 0.0012 + i);
+    ctx.fillStyle = rgba([220, 220, 240], 0.15 + 0.3 * flick);
+    ctx.fillRect(sx, sy, sr, sr);
+  }
+  ctx.restore();
+
+  // Intro scene is mostly empty
+  if (state.scene === 0) {
+    // faint appearing halos as user scrolls into scene 1
+    drawHalos(ox, oy, fieldW, fieldH, 0.25 * state.globalProg);
+    drawGalaxies(ox, oy, fieldW, fieldH, 0);
+    return;
+  }
+
+  const showHalos = state.show !== 'galaxies';
+  const showGalaxies = state.show !== 'halos';
+
+  // Scene-dependent alpha / emphasis
+  let haloAlpha = 1, galAlpha = 1;
+  if (state.scene === 1) {
+    // halos fade in
+    haloAlpha = 0.2 + 0.8 * smoothstep(0, 0.7, state.sceneProg);
+    galAlpha = 0;
+  } else if (state.scene === 2) {
+    // galaxies light up
+    haloAlpha = 1;
+    galAlpha = smoothstep(0, 0.7, state.sceneProg);
+  } else {
+    haloAlpha = 1; galAlpha = 1;
+  }
+
+  if (showHalos) drawHalos(ox, oy, fieldW, fieldH, haloAlpha);
+  if (showGalaxies) drawGalaxies(ox, oy, fieldW, fieldH, galAlpha);
+
+  // Clustering scene: draw connector lines between nearby galaxies
+  if (state.scene === 5 && showGalaxies) {
+    drawClustering(ox, oy, fieldW, fieldH, smoothstep(0, 0.6, state.sceneProg));
+  }
+}
+
+function smoothstep(a, b, x) {
+  const t = Math.max(0, Math.min(1, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+}
+
+function drawHalos(ox, oy, fw, fh, alpha) {
+  if (alpha <= 0.001) return;
+  const z = state.z;
+  let n = 0;
+  ctx.save();
+  for (let i = 0; i < halos.length; i++) {
+    const h = halos[i];
+    const logMh = haloMassAtZ(h, z);
+    if (logMh <= 0) continue;
+    // size scales with Mh^(1/3) (virial radius ~ M^1/3)
+    // scale radius by canvas size so halos read well on any viewport
+    const scale = Math.min(W, H) / 540;
+    const norm = Math.pow(10, (logMh - 12) / 3);
+    const r = (9 + 34 * Math.tanh(norm * 1.4)) * scale;
+    const px = ox + h.x0 * fw + Math.sin(state.t * h.jitter + h.phase) * 3;
+    const py = oy + h.y0 * fh + Math.cos(state.t * h.jitter * 0.8 + h.phase) * 3;
+
+    // soft halo glow
+    const g = ctx.createRadialGradient(px, py, 0, px, py, r);
+    g.addColorStop(0, rgba(COL.haloCore, 0.65 * alpha));
+    g.addColorStop(0.4, rgba(COL.halo, 0.32 * alpha));
+    g.addColorStop(1, rgba(COL.halo, 0));
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(px, py, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // thin outline for structure
+    ctx.strokeStyle = rgba(COL.halo, 0.42 * alpha);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(px, py, r * 0.55, 0, Math.PI * 2);
+    ctx.stroke();
+    n++;
+  }
+  ctx.restore();
+  document.getElementById('r-nhalo').textContent = String(n);
+}
+
+function drawGalaxies(ox, oy, fw, fh, alpha) {
+  if (alpha <= 0.001) return;
+  const z = state.z;
+  let n = 0;
+  let peakEps = -Infinity, peakLogMh = 0;
+  const scale = Math.min(W, H) / 540;
+
+  ctx.save();
+  for (let i = 0; i < halos.length; i++) {
+    const h = halos[i];
+    const logMh = haloMassAtZ(h, z);
+    if (logMh <= 9.5) continue;
+    const eps = shmrEfficiency(logMh, z);          // log10(M*/Mh)
+    const logMstar = logMh + eps;
+    if (logMstar < 7.0) continue;
+    if (eps > peakEps) { peakEps = eps; peakLogMh = logMh; }
+
+    const px = ox + h.x0 * fw + Math.sin(state.t * h.jitter + h.phase) * 3;
+    const py = oy + h.y0 * fh + Math.cos(state.t * h.jitter * 0.8 + h.phase) * 3;
+
+    // size from stellar mass (scaled with viewport)
+    const sr = (2.2 + 5.4 * Math.tanh(Math.pow(10, (logMstar - 9) / 3) * 0.5)) * scale;
+
+    // color: quenched if logMh > 12.8 else star-forming (hot if small)
+    let col;
+    if (logMh > 12.8) col = COL.galRed;
+    else if (logMstar < 9) col = COL.galHot;
+    else col = COL.gal;
+
+    // central soft glow
+    const gg = ctx.createRadialGradient(px, py, 0, px, py, sr * 3.5);
+    gg.addColorStop(0, rgba(col, 0.95 * alpha));
+    gg.addColorStop(0.4, rgba(col, 0.4 * alpha));
+    gg.addColorStop(1, rgba(col, 0));
+    ctx.fillStyle = gg;
+    ctx.beginPath();
+    ctx.arc(px, py, sr * 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // bright core
+    ctx.fillStyle = rgba(COL.star, Math.min(1, 0.95 * alpha));
+    ctx.beginPath();
+    ctx.arc(px, py, sr * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    n++;
+  }
+  ctx.restore();
+
+  document.getElementById('r-ngal').textContent = String(n);
+  if (peakEps > -Infinity) {
+    const eff = Math.pow(10, peakEps);
+    document.getElementById('r-peak').textContent = (eff * 100).toFixed(1) + '%';
+  }
+}
+
+function drawClustering(ox, oy, fw, fh, alpha) {
+  // draw lines between pairs of galaxies within a threshold
+  const z = state.z;
+  const galPts = [];
+  for (let i = 0; i < halos.length; i++) {
+    const h = halos[i];
+    const logMh = haloMassAtZ(h, z);
+    if (logMh <= 11) continue;
+    const px = ox + h.x0 * fw;
+    const py = oy + h.y0 * fh;
+    galPts.push({ x: px, y: py, m: logMh });
+  }
+  ctx.save();
+  ctx.strokeStyle = rgba(COL.gal, 0.08 * alpha);
+  ctx.lineWidth = 0.6;
+  const r2max = Math.pow(Math.min(fw, fh) * 0.09, 2);
+  for (let i = 0; i < galPts.length; i++) {
+    for (let j = i + 1; j < galPts.length; j++) {
+      const dx = galPts[i].x - galPts[j].x;
+      const dy = galPts[i].y - galPts[j].y;
+      const d2 = dx*dx + dy*dy;
+      if (d2 < r2max) {
+        ctx.beginPath();
+        ctx.moveTo(galPts[i].x, galPts[i].y);
+        ctx.lineTo(galPts[j].x, galPts[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+}
+
+/* ------------------------------------------------------------------
+   SHMR plot (SVG)
+------------------------------------------------------------------ */
+const svg = document.getElementById('shmr-svg');
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const plot = { x0: 36, y0: 16, x1: 310, y1: 170, logMhMin: 10, logMhMax: 14.5, logEpsMin: -3.5, logEpsMax: 0.2 };
+
+function svgX(logMh) {
+  return plot.x0 + (logMh - plot.logMhMin) / (plot.logMhMax - plot.logMhMin) * (plot.x1 - plot.x0);
+}
+function svgY(logEps) {
+  return plot.y1 - (logEps - plot.logEpsMin) / (plot.logEpsMax - plot.logEpsMin) * (plot.y1 - plot.y0);
+}
+
+function buildShmrStatic() {
+  // clip path so curves stay inside plot rect
+  const defs = document.createElementNS(SVG_NS, 'defs');
+  const clip = document.createElementNS(SVG_NS, 'clipPath');
+  clip.setAttribute('id', 'shmr-clip');
+  const clipRect = document.createElementNS(SVG_NS, 'rect');
+  clipRect.setAttribute('x', plot.x0);
+  clipRect.setAttribute('y', plot.y0);
+  clipRect.setAttribute('width', plot.x1 - plot.x0);
+  clipRect.setAttribute('height', plot.y1 - plot.y0);
+  clip.appendChild(clipRect);
+  defs.appendChild(clip);
+  svg.appendChild(defs);
+
+  // group for all plot contents, clipped to the axes rect
+  const plotG = document.createElementNS(SVG_NS, 'g');
+  plotG.setAttribute('id', 'shmr-plot-g');
+  plotG.setAttribute('clip-path', 'url(#shmr-clip)');
+  svg.appendChild(plotG);
+
+  // axes + grid + reference curves
+  // frame
+  const frame = document.createElementNS(SVG_NS, 'rect');
+  frame.setAttribute('x', plot.x0);
+  frame.setAttribute('y', plot.y0);
+  frame.setAttribute('width', plot.x1 - plot.x0);
+  frame.setAttribute('height', plot.y1 - plot.y0);
+  frame.setAttribute('fill', 'none');
+  frame.setAttribute('stroke', '#1c1d26');
+  frame.setAttribute('stroke-width', '1');
+  svg.appendChild(frame);
+
+  // x ticks at 10, 11, 12, 13, 14
+  for (let m = 10; m <= 14; m++) {
+    const x = svgX(m);
+    const tick = document.createElementNS(SVG_NS, 'line');
+    tick.setAttribute('x1', x); tick.setAttribute('x2', x);
+    tick.setAttribute('y1', plot.y1); tick.setAttribute('y2', plot.y1 + 4);
+    tick.setAttribute('stroke', '#3a3428'); tick.setAttribute('stroke-width', '1');
+    svg.appendChild(tick);
+
+    const label = document.createElementNS(SVG_NS, 'text');
+    label.setAttribute('x', x); label.setAttribute('y', plot.y1 + 14);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('font-family', "'JetBrains Mono', monospace");
+    label.setAttribute('font-size', '8');
+    label.setAttribute('fill', '#6b6656');
+    label.textContent = `10^${m}`;
+    svg.appendChild(label);
+  }
+  // y ticks
+  for (let e = -3; e <= 0; e++) {
+    const y = svgY(e);
+    const tick = document.createElementNS(SVG_NS, 'line');
+    tick.setAttribute('x1', plot.x0 - 4); tick.setAttribute('x2', plot.x0);
+    tick.setAttribute('y1', y); tick.setAttribute('y2', y);
+    tick.setAttribute('stroke', '#3a3428'); tick.setAttribute('stroke-width', '1');
+    svg.appendChild(tick);
+    const label = document.createElementNS(SVG_NS, 'text');
+    label.setAttribute('x', plot.x0 - 6); label.setAttribute('y', y + 3);
+    label.setAttribute('text-anchor', 'end');
+    label.setAttribute('font-family', "'JetBrains Mono', monospace");
+    label.setAttribute('font-size', '8');
+    label.setAttribute('fill', '#6b6656');
+    label.textContent = `10^${e}`;
+    svg.appendChild(label);
+  }
+
+  // axis labels
+  const xlab = document.createElementNS(SVG_NS, 'text');
+  xlab.setAttribute('x', (plot.x0 + plot.x1) / 2); xlab.setAttribute('y', plot.y1 + 28);
+  xlab.setAttribute('text-anchor', 'middle');
+  xlab.setAttribute('font-family', 'EB Garamond, serif');
+  xlab.setAttribute('font-style', 'italic');
+  xlab.setAttribute('font-size', '10');
+  xlab.setAttribute('fill', '#a39d8d');
+  xlab.textContent = 'halo mass  M_h  [M☉]';
+  svg.appendChild(xlab);
+
+  const ylab = document.createElementNS(SVG_NS, 'text');
+  ylab.setAttribute('x', 10); ylab.setAttribute('y', (plot.y0 + plot.y1) / 2);
+  ylab.setAttribute('text-anchor', 'middle');
+  ylab.setAttribute('font-family', 'EB Garamond, serif');
+  ylab.setAttribute('font-style', 'italic');
+  ylab.setAttribute('font-size', '10');
+  ylab.setAttribute('fill', '#a39d8d');
+  ylab.setAttribute('transform', `rotate(-90 10 ${(plot.y0 + plot.y1) / 2})`);
+  ylab.textContent = 'M* / M_h';
+  svg.appendChild(ylab);
+
+  // Reference curves — chosen to show the non-monotonic evolution:
+  // z=0.2 (near-today peak), z=1.5 (minimum SFE), z=3.5 (turnover), z=8 (high-z rise)
+  const refs = [0.2, 1.5, 3.5, 8];
+  for (const rz of refs) {
+    const path = document.createElementNS(SVG_NS, 'path');
+    let d = '';
+    for (let m = plot.logMhMin; m <= plot.logMhMax; m += 0.05) {
+      const eps = shmrEfficiency(m, rz);
+      const x = svgX(m), y = svgY(eps);
+      d += (d ? 'L' : 'M') + x.toFixed(1) + ',' + y.toFixed(1);
+    }
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#6b6656');
+    path.setAttribute('stroke-width', '1');
+    path.setAttribute('opacity', '0.4');
+    plotG.appendChild(path);
+
+    // small z label near right end (outside clip so it's always visible)
+    const eLast = shmrEfficiency(plot.logMhMax, rz);
+    const t = document.createElementNS(SVG_NS, 'text');
+    t.setAttribute('x', svgX(plot.logMhMax) + 2);
+    t.setAttribute('y', Math.max(plot.y0 + 6, Math.min(plot.y1 - 1, svgY(eLast) + 3)));
+    t.setAttribute('font-family', "'JetBrains Mono', monospace");
+    t.setAttribute('font-size', '7');
+    t.setAttribute('fill', '#6b6656');
+    t.textContent = 'z=' + rz;
+    svg.appendChild(t);
+  }
+
+  // current-z curve (updated in draw) — inside clip group
+  const nowPath = document.createElementNS(SVG_NS, 'path');
+  nowPath.setAttribute('id', 'shmr-now');
+  nowPath.setAttribute('fill', 'none');
+  nowPath.setAttribute('stroke', '#d9a86c');
+  nowPath.setAttribute('stroke-width', '2');
+  plotG.appendChild(nowPath);
+
+  // peak marker — inside clip group
+  const peak = document.createElementNS(SVG_NS, 'circle');
+  peak.setAttribute('id', 'shmr-peak');
+  peak.setAttribute('r', '3');
+  peak.setAttribute('fill', '#d9a86c');
+  plotG.appendChild(peak);
+}
+buildShmrStatic();
+
+function updateShmrCurve(z) {
+  let d = '';
+  for (let m = plot.logMhMin; m <= plot.logMhMax; m += 0.05) {
+    const eps = shmrEfficiency(m, z);
+    const x = svgX(m), y = svgY(eps);
+    d += (d ? 'L' : 'M') + x.toFixed(1) + ',' + y.toFixed(1);
+  }
+  document.getElementById('shmr-now').setAttribute('d', d);
+
+  // peak: find max of eps over m
+  let peakM = 12, peakE = -Infinity;
+  for (let m = 10; m <= 14; m += 0.02) {
+    const e = shmrEfficiency(m, z);
+    if (e > peakE) { peakE = e; peakM = m; }
+  }
+  const peakEl = document.getElementById('shmr-peak');
+  peakEl.setAttribute('cx', svgX(peakM));
+  peakEl.setAttribute('cy', svgY(peakE));
+
+  document.getElementById('lg-now').textContent = `z = ${z.toFixed(1)}`;
+  document.getElementById('r-z').textContent = z.toFixed(1);
+  // age of universe ~ 13.8 / (1+z)^1.5 — crude approximation
+  const age = 13.8 / Math.pow(1 + z, 1.5);
+  document.getElementById('r-age').textContent = age.toFixed(1) + ' Gyr';
+  document.getElementById('r-peakmass').textContent = '10^' + peakM.toFixed(1) + ' M☉';
+}
+updateShmrCurve(state.z);
+
+/* ------------------------------------------------------------------
+   Scroll handling → scene + progress
+------------------------------------------------------------------ */
+const scenes = [...document.querySelectorAll('.scene')];
+const controls = document.getElementById('controls');
+const shmrOverlay = document.getElementById('shmr-overlay');
+
+function onScroll() {
+  const scrollY = window.scrollY;
+  const docH = document.documentElement.scrollHeight - window.innerHeight;
+  state.globalProg = Math.max(0, Math.min(1, scrollY / docH));
+  document.getElementById('progress').style.width = (state.globalProg * 100) + '%';
+
+  // find active scene
+  let active = 0;
+  let activeProg = 0;
+  for (const s of scenes) {
+    const r = s.getBoundingClientRect();
+    const H = window.innerHeight;
+    // active when top is above center
+    if (r.top <= H * 0.5 && r.bottom > H * 0.2) {
+      active = parseInt(s.dataset.scene, 10);
+      const total = r.height;
+      // progress: 0 when top == H/2, 1 when bottom == H/2
+      const p = (H * 0.5 - r.top) / (total);
+      activeProg = Math.max(0, Math.min(1, p));
+    }
+  }
+  state.scene = active;
+  state.sceneProg = activeProg;
+
+  // Show controls (redshift dial) once scene 4 has started, or user has scrolled past scene 3
+  const showControls = active >= 4 || (active === 3 && activeProg > 0.4);
+  controls.classList.toggle('shown', showControls);
+
+  // SHMR overlay shown in scenes 3 and 4 only (hidden in scene 5 clustering + outro)
+  const showShmr = active === 3 || active === 4;
+  shmrOverlay.classList.toggle('shown', showShmr);
+
+  // Sync z from scroll when not manually controlled in scene 4
+  if (active === 4 && !state.userZ) {
+    // map scene progress to z: start at 0.5, swing up to 6 then back
+    const p = activeProg;
+    const z = 0.5 + 6 * Math.sin(p * Math.PI);
+    setZ(z, false);
+  }
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+
+/* ------------------------------------------------------------------
+   Redshift slider
+------------------------------------------------------------------ */
+const slider = document.getElementById('zslider');
+slider.addEventListener('input', (e) => {
+  state.userZ = true;
+  setZ(parseFloat(e.target.value), true);
+});
+slider.addEventListener('change', () => {
+  // stop auto-driving z once user touches slider
+});
+
+function setZ(z, fromUser) {
+  state.z = z;
+  slider.value = z.toFixed(2);
+  document.getElementById('z-val').textContent = z.toFixed(1);
+  updateShmrCurve(z);
+}
+
+// Show/hide toggle
+document.querySelectorAll('.controls [data-show]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.controls [data-show]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.show = btn.dataset.show;
+  });
+});
+
+/* ------------------------------------------------------------------
+   Main loop
+------------------------------------------------------------------ */
+function tick(dt) {
+  state.t = dt;
+  draw();
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+// initial triggers
+onScroll();
+</script>
+</body>
+</html>

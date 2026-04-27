@@ -1,0 +1,1181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>HOD Sandbox · M. Shuntov</title>
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png">
+<link rel="manifest" href="images/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05060a;
+    --bg-soft: #0b0d14;
+    --panel: #0c0e16;
+    --ink: #ece6d6;
+    --ink-soft: #a39d8d;
+    --ink-muted: #6b6656;
+    --halo: #6fa8d6;
+    --halo-soft: #2c4a6b;
+    --gal-cen: #ec6c52;         /* central (reddish) */
+    --gal-sat: #ffd66e;         /* satellite (yellow) */
+    --accent: #d9a86c;
+    --accent-2: #8ab6e8;        /* model curve */
+    --ref: #5c5547;             /* reference data band */
+    --rule: #1c1d26;
+    --rule-soft: #131420;
+    --serif: 'EB Garamond', 'Iowan Old Style', Georgia, serif;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern", "liga", "onum";
+  }
+
+  a { color: inherit; text-decoration: none; border-bottom: 1px solid #3a3428; transition: border-color .2s, color .2s; }
+  a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .mono { font-family: var(--mono); font-size: 0.82em; }
+  .small-caps { font-variant: small-caps; letter-spacing: 0.12em; }
+  .label { font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-muted); }
+
+  /* ========== TOP BAR ========== */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 20;
+    padding: 1rem 1.6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    background: linear-gradient(to bottom, rgba(5,6,10,0.9), rgba(5,6,10,0.4));
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .topbar a { border: none; }
+  .topbar a:hover { color: var(--accent); }
+  .topbar .title { color: var(--ink); font-family: var(--serif); font-style: italic; font-size: 0.95rem; letter-spacing: 0; text-transform: none; }
+  .topbar .title b { color: var(--accent); font-weight: 500; font-style: normal; }
+  .topbar .dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin: 0 0.5rem; vertical-align: middle; }
+
+  /* ========== APP LAYOUT ========== */
+  .app {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    padding: 4rem 1.4rem 1.4rem;
+    display: grid;
+    grid-template-columns: 1fr 26rem;
+    grid-template-rows: 1fr;
+    gap: 1rem;
+    min-height: 100vh;
+  }
+
+  /* ========== FIELD (left) ========== */
+  .field {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  #field-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .field-caption {
+    position: absolute;
+    top: 1rem; left: 1.2rem;
+    z-index: 2;
+    pointer-events: none;
+    max-width: 26rem;
+  }
+  .field-caption .overline {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+  .field-caption h1 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 1.4rem;
+    line-height: 1.15;
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.005em;
+  }
+  .field-caption h1 em { color: var(--accent); font-style: italic; font-weight: 400; }
+  .field-caption p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    font-style: italic;
+    max-width: 32ch;
+  }
+
+  .field-scale {
+    position: absolute;
+    bottom: 1rem; left: 1.2rem;
+    z-index: 2;
+    pointer-events: none;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.1em;
+  }
+  .field-scale .bar {
+    display: inline-block;
+    width: 4rem;
+    height: 2px;
+    background: var(--ink-muted);
+    margin-right: 0.4rem;
+    vertical-align: middle;
+  }
+
+  .field-legend {
+    position: absolute;
+    top: 1rem; right: 1.2rem;
+    z-index: 2;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--ink-soft);
+    text-align: right;
+  }
+  .field-legend span { display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; }
+  .field-legend span::after {
+    content: '';
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .field-legend .l-halo::after { background: radial-gradient(circle, rgba(120,175,220,0.6), rgba(120,175,220,0.15)); border: 1px solid rgba(120,175,220,0.5); }
+  .field-legend .l-cen::after { background: #ec6c52; box-shadow: 0 0 6px rgba(236,108,82,0.8); }
+  .field-legend .l-sat::after { background: #ffd66e; box-shadow: 0 0 4px rgba(255,214,110,0.6); }
+
+  /* zoom controls */
+  .zoom-ctrl {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-end;
+  }
+  .zoom-ctrl button {
+    width: 30px; height: 30px;
+    background: rgba(12,14,22,0.85);
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    font-family: var(--mono);
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color .15s, border-color .15s, background .15s;
+    border-radius: 2px;
+  }
+  .zoom-ctrl button:hover { color: var(--ink); border-color: var(--ink-muted); background: rgba(18,22,34,0.95); }
+  .zoom-ctrl .zoom-hint {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    color: var(--ink-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 0.3rem;
+    text-align: right;
+    max-width: 140px;
+  }
+
+  /* ========== CONTROLS + PLOT (right) ========== */
+  .right {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: 1rem;
+    min-height: 0;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.2rem 1.3rem;
+  }
+  .panel h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 1.02rem;
+    margin: 0 0 0.15rem;
+  }
+  .panel .sub {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-muted);
+    font-size: 0.84rem;
+    margin-bottom: 1rem;
+  }
+
+  .slider-row { margin-bottom: 0.9rem; }
+  .slider-row:last-child { margin-bottom: 0; }
+  .slider-row .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.25rem;
+  }
+  .slider-row .name {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+  .slider-row .name .expl {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-left: 0.35rem;
+  }
+  .slider-row .val {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+  .slider-row input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+    margin: 0;
+  }
+  .slider-row .hint {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 0.76rem;
+    color: var(--ink-muted);
+    margin-top: 0.2rem;
+    line-height: 1.3;
+  }
+
+  .presets {
+    display: flex;
+    gap: 0.35rem;
+    margin-top: 0.85rem;
+    flex-wrap: wrap;
+  }
+  .presets button {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.45rem 0.3rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all .15s;
+  }
+  .presets button:hover { color: var(--ink); border-color: var(--ink-soft); }
+  .presets button.active { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+
+  /* readout */
+  .readout {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 0.9rem 1.1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.35rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+  }
+  .readout .stat { display: flex; flex-direction: column; gap: 0.1rem; }
+  .readout .stat .k { color: var(--ink-muted); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; }
+  .readout .stat .v { color: var(--ink); font-size: 0.96rem; }
+  .readout .stat .v b { color: var(--accent); font-weight: 500; }
+
+  /* plot */
+  .plot-panel {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1rem 1.1rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .plot-panel .plot-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.4rem;
+  }
+  .plot-panel h3 { margin: 0; font-family: var(--serif); font-weight: 500; font-size: 0.98rem; }
+  .plot-panel .legend {
+    display: flex;
+    gap: 0.9rem;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.1em;
+  }
+  .plot-panel .legend span::before {
+    content: '';
+    display: inline-block;
+    width: 14px; height: 2px;
+    vertical-align: middle;
+    margin-right: 0.35rem;
+  }
+  .plot-panel .legend .l-model::before { background: var(--accent); }
+  .plot-panel .legend .l-1h::before { background: var(--gal-sat); border-top: 1px dashed var(--gal-sat); height: 0; }
+  .plot-panel .legend .l-2h::before { background: var(--halo); border-top: 1px dashed var(--halo); height: 0; }
+  .plot-panel .legend .l-ref::before { background: var(--ref); }
+
+  #plot-svg {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+  }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 1100px) {
+    .app {
+      grid-template-columns: 1fr;
+      grid-template-rows: 60vh auto;
+      padding-top: 4rem;
+    }
+    .right { min-height: auto; }
+    .field-caption h1 { font-size: 1.1rem; }
+    .field-caption p { display: none; }
+  }
+  @media (max-width: 700px) {
+    .app { padding: 4rem 0.8rem 0.8rem; gap: 0.7rem; }
+    .panel { padding: 0.9rem 1rem; }
+    .readout { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a href="index.html">&larr; Marko Shuntov</a>
+  <div class="title"><b>HOD Sandbox</b></div>
+  <div><a href="galaxy-halo.html">Essay →</a></div>
+</nav>
+
+<main class="app">
+  <!-- FIELD -->
+  <div class="field">
+    <canvas id="field-canvas" aria-hidden="true"></canvas>
+
+    <div class="field-caption">
+      <div class="overline">§ Interactive</div>
+      <h1>Populate halos with galaxies.</h1>
+      <p>Move the three knobs on the right. Galaxies appear and cluster; the correlation function below updates in real time.</p>
+    </div>
+
+    <div class="field-legend">
+      <span class="l-halo">dark-matter halo</span>
+      <span class="l-cen">central galaxy</span>
+      <span class="l-sat">satellite</span>
+    </div>
+
+    <div class="field-scale"><span class="bar"></span> 50 Mpc/h</div>
+
+    <div class="zoom-ctrl">
+      <button id="zoom-in" title="Zoom in">+</button>
+      <button id="zoom-out" title="Zoom out">−</button>
+      <button id="zoom-reset" title="Reset view">⤢</button>
+      <div class="zoom-hint">scroll · drag · dbl-click to reset</div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="right">
+
+    <div class="panel">
+      <h3>Halo Occupation Distribution</h3>
+      <p class="sub">⟨N_cen⟩ = ½[1 + erf((log M_h − log M_min) / σ)] &nbsp;·&nbsp; ⟨N_sat⟩ = ⟨N_cen⟩ · ((M_h − M_cut) / M_1)^α</p>
+
+      <div class="slider-row">
+        <div class="head">
+          <span class="name">log M<sub>min</sub> <span class="expl">central threshold</span></span>
+          <span class="val" id="v-mmin">11.5</span>
+        </div>
+        <input type="range" id="s-mmin" min="10.5" max="13.5" step="0.05" value="11.5">
+        <div class="hint">Only halos above this mass host a central galaxy. Raise it → galaxies disappear from small halos.</div>
+      </div>
+
+      <div class="slider-row">
+        <div class="head">
+          <span class="name">log M<sub>1</sub> <span class="expl">one-satellite scale</span></span>
+          <span class="val" id="v-m1">13.0</span>
+        </div>
+        <input type="range" id="s-m1" min="11.5" max="14.5" step="0.05" value="13.0">
+        <div class="hint">Halo mass at which a central hosts, on average, one satellite. Lower it → satellites bloom.</div>
+      </div>
+
+      <div class="slider-row">
+        <div class="head">
+          <span class="name">α <span class="expl">satellite slope</span></span>
+          <span class="val" id="v-alpha">1.00</span>
+        </div>
+        <input type="range" id="s-alpha" min="0.6" max="1.6" step="0.02" value="1.00">
+        <div class="hint">Slope of ⟨N_sat⟩(M_h). Higher α → satellite numbers rise steeply with halo mass.</div>
+      </div>
+
+      <div class="presets">
+        <button data-preset="lowz" class="active">z &lt; 0.5</button>
+        <button data-preset="midz">z ≈ 1</button>
+        <button data-preset="highz">z ≈ 3</button>
+        <button data-preset="sat">Sat-heavy</button>
+      </div>
+    </div>
+
+    <div class="readout">
+      <div class="stat"><span class="k">N galaxies</span><span class="v" id="r-ng"><b>—</b></span></div>
+      <div class="stat"><span class="k">Satellite frac.</span><span class="v" id="r-fsat"><b>—</b></span></div>
+      <div class="stat"><span class="k">Galaxy bias</span><span class="v" id="r-bias"><b>—</b></span></div>
+      <div class="stat"><span class="k">⟨N_cen⟩</span><span class="v" id="r-ncen">—</span></div>
+      <div class="stat"><span class="k">⟨N_sat⟩</span><span class="v" id="r-nsat">—</span></div>
+      <div class="stat"><span class="k">M_eff</span><span class="v" id="r-meff">—</span></div>
+    </div>
+
+    <div class="plot-panel">
+      <div class="plot-head">
+        <h3>Two-point correlation function ξ(r)</h3>
+      </div>
+      <svg id="plot-svg" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="legend" style="margin-top: 0.2rem;">
+        <span class="l-model">model</span>
+        <span class="l-1h">1-halo</span>
+        <span class="l-2h">2-halo</span>
+        <span class="l-ref">reference</span>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+/* ==================================================================
+   HOD Sandbox
+   - Generate a 2D field of halos drawn from a Schechter-ish halo mass fn
+   - Populate with HOD: P(Ncen | Mh) erf, <Nsat|Mh> power law
+   - Satellites placed with NFW-like profile around halo center
+   - Compute ξ(r) in log bins: 1h (same halo pairs) + 2h (different halos)
+================================================================== */
+
+/* ---------- RNG ---------- */
+function mulberry32(a) {
+  return function() {
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+}
+function randnF(rand) {
+  const u = Math.max(1e-9, rand()), v = rand();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+/* ---------- Halo mass function (Sheth–Tormen-ish, schematic)
+   dn/dlogMh ~ Mh^(-0.8) * exp(-(Mh/Mstar)^1) with knee at ~10^13
+   We'll just sample logMh from a power law + exp cutoff.
+------------------------------------------------------------------ */
+function sampleLogMh(rand) {
+  // Inverse-transform-ish: pick u and return
+  const u = rand();
+  // Heavy low-mass tail, with exponential cutoff at high mass (Schechter-like).
+  // Sample logM with steep exponent then add exp(-M/M*) rejection.
+  let logM;
+  for (let tries = 0; tries < 8; tries++) {
+    logM = 10.2 + 3.5 * Math.pow(u, 2.6) + 0.08 * randnF(rand);
+    // rejection: accept with prob exp(-10^(logM - 13.2))
+    const cut = Math.exp(-Math.pow(10, logM - 13.2));
+    if (rand() < cut) break;
+    // else resample u
+    const u2 = rand();
+    logM = 10.2 + 3.5 * Math.pow(u2, 2.6);
+  }
+  return Math.min(14.2, Math.max(10.05, logM));
+}
+
+/* ---------- Build halo catalog ---------- */
+const BOX_MPC = 500;   // field size in Mpc/h (nominal)
+const N_HALOS = 600;   // denser catalog → better ξ statistics at large r
+let halos = [];
+let fieldSeed = 42;
+
+function buildHalos() {
+  const rand = mulberry32(fieldSeed);
+  halos = [];
+  // Seed cluster centers (mild clustering so the field has structure)
+  const seeds = [];
+  for (let i = 0; i < 14; i++) seeds.push([rand(), rand(), 0.02 + rand() * 0.07]);
+
+  for (let i = 0; i < N_HALOS; i++) {
+    let x, y;
+    if (rand() < 0.35) {
+      // anchor to a seed
+      const s = seeds[(rand() * seeds.length) | 0];
+      x = s[0] + randnF(rand) * s[2];
+      y = s[1] + randnF(rand) * s[2];
+    } else {
+      x = rand();
+      y = rand();
+    }
+    // wrap-toroidal
+    x = ((x % 1) + 1) % 1;
+    y = ((y % 1) + 1) % 1;
+
+    const logMh = sampleLogMh(rand);
+    // virial radius proportional to Mh^(1/3), normalised so logMh=13 gives ~10 Mpc/h radius
+    const rvir = 0.5 * Math.pow(10, (logMh - 12) / 3); // in Mpc/h (schematic)
+
+    halos.push({
+      x, y,                    // [0,1]^2 normalised coords
+      logMh,
+      rvir,                    // in Mpc/h
+      // satellites filled per HOD eval
+      cen: false,
+      sats: [],
+    });
+  }
+}
+buildHalos();
+
+/* ---------- HOD ---------- */
+const HOD = { logMmin: 11.5, sigma: 0.3, logMcut: 10.5, logM1: 13.0, alpha: 1.0 };
+
+function Ncen(logMh) {
+  // erf approx
+  const x = (logMh - HOD.logMmin) / HOD.sigma;
+  return 0.5 * (1 + erf(x));
+}
+function Nsat(logMh) {
+  if (logMh < HOD.logMcut) return 0;
+  const ratio = (Math.pow(10, logMh) - Math.pow(10, HOD.logMcut)) / Math.pow(10, HOD.logM1);
+  if (ratio <= 0) return 0;
+  return Ncen(logMh) * Math.pow(ratio, HOD.alpha);
+}
+
+// Abramowitz & Stegun erf approx
+function erf(x) {
+  const sign = x < 0 ? -1 : 1;
+  x = Math.abs(x);
+  const t = 1 / (1 + 0.3275911 * x);
+  const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+  return sign * y;
+}
+
+/* ---------- Populate galaxies ---------- */
+function populate() {
+  const rand = mulberry32(fieldSeed + 7);
+  for (const h of halos) {
+    // central: probability = Ncen
+    h.cen = rand() < Ncen(h.logMh);
+    // number of satellites: Poisson-ish, round using fractional
+    const mean = Nsat(h.logMh);
+    // draw Poisson (small mean, direct)
+    let ns = 0;
+    if (mean > 0) {
+      let L = Math.exp(-mean), k = 0, p = 1;
+      do { k++; p *= rand(); } while (p > L);
+      ns = k - 1;
+    }
+    h.sats = [];
+    if (ns > 0) {
+      const rv = h.rvir / BOX_MPC; // normalised
+      for (let s = 0; s < ns; s++) {
+        // NFW-ish radial draw: sample u in [0,1], r = -rv * log(1-u*(1 - exp(-c)))/c with c=5
+        // simpler: r = rv * (u)^0.5 gives softer distribution
+        const u = rand();
+        const r = rv * Math.pow(u, 0.6);   // favour inner satellites
+        const theta = rand() * Math.PI * 2;
+        h.sats.push({
+          dx: r * Math.cos(theta),
+          dy: r * Math.sin(theta),
+        });
+      }
+    }
+  }
+}
+
+/* ==================================================================
+   Canvas render
+================================================================== */
+const cvs = document.getElementById('field-canvas');
+const cctx = cvs.getContext('2d');
+let FW = 0, FH = 0;
+const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+function resizeCanvas() {
+  const r = cvs.getBoundingClientRect();
+  FW = r.width; FH = r.height;
+  cvs.width = FW * DPR; cvs.height = FH * DPR;
+  cctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  draw();
+}
+window.addEventListener('resize', resizeCanvas);
+
+/* ---------- Zoom + pan ---------- */
+function clampView() {
+  view.zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, view.zoom));
+  // keep at least 10% of field on screen (tx,ty in fraction of zoomed side)
+  const maxT = (view.zoom - 1) / view.zoom * 0.5 + 0.05;
+  view.tx = Math.max(-maxT, Math.min(maxT, view.tx));
+  view.ty = Math.max(-maxT, Math.min(maxT, view.ty));
+}
+
+cvs.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const rect = cvs.getBoundingClientRect();
+  const baseSide = Math.min(rect.width, rect.height) * 0.96;
+  const sideNow = baseSide * view.zoom;
+  const ox = (rect.width - baseSide) / 2 - view.tx * sideNow;
+  const oy = (rect.height - baseSide) / 2 - view.ty * sideNow;
+  // cursor in unit-square coords BEFORE zoom
+  const cxU = (e.clientX - rect.left - ox) / sideNow;
+  const cyU = (e.clientY - rect.top - oy) / sideNow;
+
+  const factor = Math.exp(-e.deltaY * 0.0015);
+  const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, view.zoom * factor));
+  view.zoom = newZoom;
+  const sideNew = baseSide * view.zoom;
+  // reposition so cursor stays on same unit-square point
+  view.tx = (cxU * sideNew - (e.clientX - rect.left - (rect.width - baseSide) / 2)) / sideNew;
+  view.ty = (cyU * sideNew - (e.clientY - rect.top - (rect.height - baseSide) / 2)) / sideNew;
+  clampView();
+  draw();
+}, { passive: false });
+
+let dragging = false, dragX0 = 0, dragY0 = 0, tx0 = 0, ty0 = 0;
+cvs.addEventListener('pointerdown', (e) => {
+  if (view.zoom <= 1.001) return; // don't drag at base zoom
+  dragging = true;
+  dragX0 = e.clientX; dragY0 = e.clientY;
+  tx0 = view.tx; ty0 = view.ty;
+  cvs.setPointerCapture(e.pointerId);
+  cvs.style.cursor = 'grabbing';
+});
+cvs.addEventListener('pointermove', (e) => {
+  if (!dragging) return;
+  const rect = cvs.getBoundingClientRect();
+  const baseSide = Math.min(rect.width, rect.height) * 0.96;
+  const sideNow = baseSide * view.zoom;
+  view.tx = tx0 - (e.clientX - dragX0) / sideNow;
+  view.ty = ty0 - (e.clientY - dragY0) / sideNow;
+  clampView();
+  draw();
+});
+cvs.addEventListener('pointerup', (e) => {
+  dragging = false;
+  cvs.style.cursor = view.zoom > 1.001 ? 'grab' : 'default';
+});
+cvs.addEventListener('dblclick', () => { view.zoom = 1; view.tx = 0; view.ty = 0; cvs.style.cursor = 'default'; draw(); });
+
+function resetView() { view.zoom = 1; view.tx = 0; view.ty = 0; cvs.style.cursor = 'default'; draw(); }
+
+/* colors */
+const C = {
+  halo: [120, 175, 220],
+  haloCore: [95, 145, 205],
+  cen: [236, 108, 82],        // reddish — central
+  sat: [255, 214, 110],       // yellow — satellite
+  star: [255, 245, 220],
+};
+/* viewport transform: pan (tx,ty in fraction of side) + zoom */
+const view = { zoom: 1, tx: 0, ty: 0 };
+const MIN_ZOOM = 1, MAX_ZOOM = 16;
+function rgba(c, a) { return `rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`; }
+
+function draw() {
+  if (!FW) return;
+  // bg radial
+  const bg = cctx.createRadialGradient(FW * 0.5, FH * 0.5, 20, FW * 0.5, FH * 0.5, Math.max(FW, FH) * 0.75);
+  bg.addColorStop(0, 'rgba(18,20,34,1)');
+  bg.addColorStop(0.7, 'rgba(10,11,18,1)');
+  bg.addColorStop(1, 'rgba(5,6,10,1)');
+  cctx.fillStyle = bg;
+  cctx.fillRect(0, 0, FW, FH);
+
+  // subtle star dust
+  const starR = mulberry32(11);
+  cctx.save();
+  for (let i = 0; i < 140; i++) {
+    const sx = starR() * FW, sy = starR() * FH;
+    cctx.fillStyle = rgba([200, 200, 230], 0.06 + starR() * 0.12);
+    const r = starR() * 0.8 + 0.2;
+    cctx.fillRect(sx, sy, r, r);
+  }
+  cctx.restore();
+
+  // the square of the field: use min dimension so it stays a square mapping
+  // We'll map unit-square to [pad, FW-pad] x [pad, FH-pad]
+  const baseSide = Math.min(FW, FH) * 0.96;
+  const side = baseSide * view.zoom;
+  const ox = (FW - baseSide) / 2 - view.tx * side;
+  const oy = (FH - baseSide) / 2 - view.ty * side;
+
+  // scale Mpc → px: BOX_MPC maps to side
+  const MPC2PX = side / BOX_MPC;
+
+  // Visibility boost for halo extent: real rvir is tiny (~0.4 Mpc @ 10^13) vs 500 Mpc box.
+  // Inflate rvir for rendering only, by a factor that also grows with zoom.
+  const HALO_VIZ_BOOST = 14;
+
+  // Halos: soft blue glow
+  for (const h of halos) {
+    const x = ox + h.x * side, y = oy + h.y * side;
+    // off-screen culling
+    if (x < -80 || y < -80 || x > FW + 80 || y > FH + 80) continue;
+    const rpx = Math.max(8, h.rvir * MPC2PX * HALO_VIZ_BOOST);
+    const g = cctx.createRadialGradient(x, y, 0, x, y, rpx);
+    g.addColorStop(0, rgba(C.haloCore, 0.42));
+    g.addColorStop(0.45, rgba(C.halo, 0.18));
+    g.addColorStop(1, rgba(C.halo, 0));
+    cctx.fillStyle = g;
+    cctx.beginPath();
+    cctx.arc(x, y, rpx, 0, Math.PI * 2);
+    cctx.fill();
+
+    // faint outline ring at ~rvir
+    cctx.strokeStyle = rgba(C.halo, 0.28);
+    cctx.lineWidth = 0.9;
+    cctx.beginPath();
+    cctx.arc(x, y, rpx * 0.72, 0, Math.PI * 2);
+    cctx.stroke();
+  }
+
+  // Centrals
+  for (const h of halos) {
+    if (!h.cen) continue;
+    const x = ox + h.x * side, y = oy + h.y * side;
+    if (x < -30 || y < -30 || x > FW + 30 || y > FH + 30) continue;
+    // glow
+    const gr = (5 + Math.max(0, h.logMh - 11) * 1.5) * Math.min(2, Math.sqrt(view.zoom));
+    const g = cctx.createRadialGradient(x, y, 0, x, y, gr * 2.8);
+    g.addColorStop(0, rgba(C.cen, 0.95));
+    g.addColorStop(0.4, rgba(C.cen, 0.35));
+    g.addColorStop(1, rgba(C.cen, 0));
+    cctx.fillStyle = g;
+    cctx.beginPath();
+    cctx.arc(x, y, gr * 2.8, 0, Math.PI * 2);
+    cctx.fill();
+    // core
+    cctx.fillStyle = rgba([255, 230, 210], 1);
+    cctx.beginPath();
+    cctx.arc(x, y, 1.8 * Math.min(2.2, Math.sqrt(view.zoom)), 0, Math.PI * 2);
+    cctx.fill();
+  }
+
+  // Satellites — scale with inflated halo rvir so they stay inside the glow
+  for (const h of halos) {
+    if (!h.sats.length) continue;
+    const x0 = ox + h.x * side, y0 = oy + h.y * side;
+    if (x0 < -80 || y0 < -80 || x0 > FW + 80 || y0 > FH + 80) continue;
+    const rBoost = HALO_VIZ_BOOST; // satellites drawn within inflated halo
+    for (const s of h.sats) {
+      const x = x0 + s.dx * side * rBoost, y = y0 + s.dy * side * rBoost;
+      const sr = 6 * Math.min(2, Math.sqrt(view.zoom));
+      const g = cctx.createRadialGradient(x, y, 0, x, y, sr);
+      g.addColorStop(0, rgba(C.sat, 0.85));
+      g.addColorStop(0.4, rgba(C.sat, 0.28));
+      g.addColorStop(1, rgba(C.sat, 0));
+      cctx.fillStyle = g;
+      cctx.beginPath();
+      cctx.arc(x, y, sr, 0, Math.PI * 2);
+      cctx.fill();
+      cctx.fillStyle = rgba([255, 240, 200], 0.95);
+      cctx.beginPath();
+      cctx.arc(x, y, 1.0 * Math.min(2.2, Math.sqrt(view.zoom)), 0, Math.PI * 2);
+      cctx.fill();
+    }
+  }
+}
+
+/* ==================================================================
+   Correlation function ξ(r): log-binned, toroidal distance
+================================================================== */
+// Log-spaced bins in Mpc
+// r range: capped at 0.4·L so we don't probe the edge-dominated regime
+const rMin = 0.3, rMax = BOX_MPC * 0.4;  // 0.3 to 200 Mpc/h
+const NBINS = 18;
+const rEdges = [];
+for (let i = 0; i <= NBINS; i++) {
+  rEdges.push(rMin * Math.pow(rMax / rMin, i / NBINS));
+}
+const rCent = [];
+for (let i = 0; i < NBINS; i++) rCent.push(Math.sqrt(rEdges[i] * rEdges[i + 1]));
+
+function distToroid(x1, y1, x2, y2) {
+  let dx = Math.abs(x1 - x2), dy = Math.abs(y1 - y2);
+  if (dx > 0.5) dx = 1 - dx;
+  if (dy > 0.5) dy = 1 - dy;
+  return Math.sqrt(dx * dx + dy * dy) * BOX_MPC;
+}
+
+function computeCorrelation() {
+  // Collect galaxies into flat arrays
+  const _gx = [], _gy = [], _gh = [];
+  for (let hi = 0; hi < halos.length; hi++) {
+    const h = halos[hi];
+    if (h.cen) { _gx.push(h.x); _gy.push(h.y); _gh.push(hi); }
+    for (const s of h.sats) {
+      let sx = h.x + s.dx, sy = h.y + s.dy;
+      sx = ((sx % 1) + 1) % 1;
+      sy = ((sy % 1) + 1) % 1;
+      _gx.push(sx); _gy.push(sy); _gh.push(hi);
+    }
+  }
+  const ngal = _gx.length;
+  const gx = new Float32Array(_gx);
+  const gy = new Float32Array(_gy);
+  const gh = new Int32Array(_gh);
+
+  // DD 1-halo (same-halo pairs) and 2-halo (cross-halo pairs)
+  const DD1 = new Float64Array(NBINS);
+  const DD2 = new Float64Array(NBINS);
+  const rMinU = rMin / BOX_MPC, rMaxU = rMax / BOX_MPC;
+  const rMinU2 = rMinU * rMinU, rMaxU2 = rMaxU * rMaxU;
+  const invLogStep = NBINS / Math.log(rMax / rMin);
+  const logRmin = Math.log(rMin);
+
+  for (let i = 0; i < ngal; i++) {
+    const xi = gx[i], yi = gy[i], hi = gh[i];
+    for (let j = i + 1; j < ngal; j++) {
+      let dx = xi - gx[j]; if (dx < 0) dx = -dx; if (dx > 0.5) dx = 1 - dx;
+      let dy = yi - gy[j]; if (dy < 0) dy = -dy; if (dy > 0.5) dy = 1 - dy;
+      const r2u = dx * dx + dy * dy;
+      if (r2u < rMinU2 || r2u >= rMaxU2) continue;
+      const r = Math.sqrt(r2u) * BOX_MPC;
+      const bin = ((Math.log(r) - logRmin) * invLogStep) | 0;
+      if (bin < 0 || bin >= NBINS) continue;
+      if (gh[j] === hi) DD1[bin]++; else DD2[bin]++;
+    }
+  }
+
+  // RR = expected pairs for a Poisson sample on the torus in a 2D annulus
+  //    = N(N-1)/2 · (π(r₂² − r₁²)) / L²
+  // The total 2D correlation function is ξ(r) = DD/RR − 1.
+  // Decomposed:
+  //   ξ_1h(r)  ≡  DD1/RR          (1-halo pairs are in excess; no −1 needed, RR alone
+  //                                 is the baseline)
+  //   ξ_2h(r)  ≡  DD2/RR − 1      (2-halo pairs should recover ξ_linear on large scales)
+  //   ξ(r)     ≡  (DD1+DD2)/RR − 1
+  const xi1 = new Array(NBINS).fill(0);
+  const xi2 = new Array(NBINS).fill(0);
+  const xiTot = new Array(NBINS).fill(0);
+  const xi1Err = new Array(NBINS).fill(0);
+  const xi2Err = new Array(NBINS).fill(0);
+  const totalPairs = ngal * (ngal - 1) / 2;
+  const boxArea = BOX_MPC * BOX_MPC;
+  for (let i = 0; i < NBINS; i++) {
+    const r1 = rEdges[i], r2 = rEdges[i + 1];
+    const annulus = Math.PI * (r2 * r2 - r1 * r1);
+    const RR = totalPairs * annulus / boxArea;
+    if (RR <= 0 || ngal < 2) continue;
+    xi1[i] = DD1[i] / RR;
+    xi2[i] = DD2[i] / RR - 1;
+    xiTot[i] = (DD1[i] + DD2[i]) / RR - 1;
+    // Poisson errors on DD → fractional err on xi
+    xi1Err[i] = Math.sqrt(Math.max(1, DD1[i])) / RR;
+    xi2Err[i] = Math.sqrt(Math.max(1, DD2[i])) / RR;
+  }
+
+  // Galaxy bias: ξ_gg / ξ_mm on large scales.
+  // Fit b² on 4–40 Mpc/h using the TOTAL ξ (where 2-halo dominates), matter ref = (r/5)^-1.8 × 2D proj factor.
+  // Since we're in a 2D projection, the matter ξ has a shallower slope. We just use a fiducial
+  // that matches real-space matter at r₀ = 5 Mpc/h for consistency with Σ(r).
+  let biasSum = 0, biasW = 0;
+  for (let i = 0; i < NBINS; i++) {
+    if (rCent[i] >= 4 && rCent[i] <= 40) {
+      const xiMatter = Math.pow(rCent[i] / 5.0, -1.8);
+      const xiGG = xiTot[i];
+      if (xiGG > 0 && xiMatter > 0) {
+        const b = Math.sqrt(xiGG / xiMatter);
+        const w = 1 / Math.max(0.01, (xi2Err[i] / Math.max(1e-3, xiGG)) ** 2);
+        biasSum += b * w;
+        biasW += w;
+      }
+    }
+  }
+  const bias = biasW > 0 ? biasSum / biasW : 0;
+
+  return { ngal, xi1, xi2, xiTot, bias };
+}
+
+/* ==================================================================
+   SVG plot
+================================================================== */
+const svg = document.getElementById('plot-svg');
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const P = {
+  W: 400, H: 260,
+  mx: 42, my: 18,
+  mxR: 8, myB: 38,
+  xMin: Math.log10(rMin), xMax: Math.log10(rMax),
+  yMin: -1.2, yMax: 3.3, // log10(xi)
+};
+function px(x) { // x = log10(r)
+  return P.mx + (x - P.xMin) / (P.xMax - P.xMin) * (P.W - P.mx - P.mxR);
+}
+function py(y) {
+  return P.my + (P.yMax - y) / (P.yMax - P.yMin) * (P.H - P.my - P.myB);
+}
+
+function buildPlotStatic() {
+  // frame
+  const frame = document.createElementNS(SVG_NS, 'rect');
+  frame.setAttribute('x', P.mx); frame.setAttribute('y', P.my);
+  frame.setAttribute('width', P.W - P.mx - P.mxR);
+  frame.setAttribute('height', P.H - P.my - P.myB);
+  frame.setAttribute('fill', 'none'); frame.setAttribute('stroke', '#1c1d26');
+  svg.appendChild(frame);
+
+  // grid
+  for (let lx = Math.ceil(P.xMin); lx <= Math.floor(P.xMax); lx++) {
+    const x = px(lx);
+    const g = document.createElementNS(SVG_NS, 'line');
+    g.setAttribute('x1', x); g.setAttribute('x2', x);
+    g.setAttribute('y1', P.my); g.setAttribute('y2', P.H - P.myB);
+    g.setAttribute('stroke', '#131420'); g.setAttribute('stroke-width', '1');
+    svg.appendChild(g);
+    const t = document.createElementNS(SVG_NS, 'text');
+    t.setAttribute('x', x); t.setAttribute('y', P.H - P.myB + 12);
+    t.setAttribute('fill', '#6b6656'); t.setAttribute('font-family', "'JetBrains Mono', monospace");
+    t.setAttribute('font-size', '8'); t.setAttribute('text-anchor', 'middle');
+    t.textContent = '10^' + lx;
+    svg.appendChild(t);
+  }
+  for (let ly = Math.ceil(P.yMin); ly <= Math.floor(P.yMax); ly++) {
+    const y = py(ly);
+    const g = document.createElementNS(SVG_NS, 'line');
+    g.setAttribute('x1', P.mx); g.setAttribute('x2', P.W - P.mxR);
+    g.setAttribute('y1', y); g.setAttribute('y2', y);
+    g.setAttribute('stroke', '#131420'); g.setAttribute('stroke-width', '1');
+    svg.appendChild(g);
+    const t = document.createElementNS(SVG_NS, 'text');
+    t.setAttribute('x', P.mx - 4); t.setAttribute('y', y + 3);
+    t.setAttribute('fill', '#6b6656'); t.setAttribute('font-family', "'JetBrains Mono', monospace");
+    t.setAttribute('font-size', '8'); t.setAttribute('text-anchor', 'end');
+    t.textContent = '10^' + ly;
+    svg.appendChild(t);
+  }
+
+  // axis labels
+  const xl = document.createElementNS(SVG_NS, 'text');
+  xl.setAttribute('x', (P.mx + P.W - P.mxR) / 2);
+  xl.setAttribute('y', P.H - 4);
+  xl.setAttribute('font-family', 'EB Garamond, serif');
+  xl.setAttribute('font-style', 'italic');
+  xl.setAttribute('font-size', '11');
+  xl.setAttribute('fill', '#a39d8d');
+  xl.setAttribute('text-anchor', 'middle');
+  xl.textContent = 'separation r  [Mpc/h]';
+  svg.appendChild(xl);
+
+  const yl = document.createElementNS(SVG_NS, 'text');
+  yl.setAttribute('x', 12); yl.setAttribute('y', (P.my + P.H - P.myB) / 2);
+  yl.setAttribute('font-family', 'EB Garamond, serif');
+  yl.setAttribute('font-style', 'italic');
+  yl.setAttribute('font-size', '11');
+  yl.setAttribute('fill', '#a39d8d');
+  yl.setAttribute('text-anchor', 'middle');
+  yl.setAttribute('transform', `rotate(-90 12 ${(P.my + P.H - P.myB) / 2})`);
+  yl.textContent = 'ξ(r)';
+  svg.appendChild(yl);
+
+  // Reference power law data band (schematic Shuntov+22-like)
+  const refBand = document.createElementNS(SVG_NS, 'path');
+  let d = '';
+  for (let lx = P.xMin; lx <= P.xMax; lx += 0.05) {
+    const r = Math.pow(10, lx);
+    // reference: r0 ~ 5, gamma ~ 1.7 → xi = (r/r0)^-gamma
+    const xi = Math.pow(r / 5, -1.7);
+    const y = Math.log10(Math.max(1e-3, xi));
+    d += (d ? 'L' : 'M') + px(lx).toFixed(1) + ',' + py(y).toFixed(1);
+  }
+  refBand.setAttribute('d', d);
+  refBand.setAttribute('fill', 'none');
+  refBand.setAttribute('stroke', '#5c5547');
+  refBand.setAttribute('stroke-width', '6');
+  refBand.setAttribute('stroke-linecap', 'round');
+  refBand.setAttribute('opacity', '0.35');
+  svg.appendChild(refBand);
+
+  // actual model paths
+  const p1h = document.createElementNS(SVG_NS, 'path');
+  p1h.setAttribute('id', 'p-1h'); p1h.setAttribute('fill', 'none');
+  p1h.setAttribute('stroke', '#ffe19a'); p1h.setAttribute('stroke-width', '1.3');
+  p1h.setAttribute('stroke-dasharray', '3 3');
+  svg.appendChild(p1h);
+
+  const p2h = document.createElementNS(SVG_NS, 'path');
+  p2h.setAttribute('id', 'p-2h'); p2h.setAttribute('fill', 'none');
+  p2h.setAttribute('stroke', '#6fa8d6'); p2h.setAttribute('stroke-width', '1.3');
+  p2h.setAttribute('stroke-dasharray', '3 3');
+  svg.appendChild(p2h);
+
+  const pTot = document.createElementNS(SVG_NS, 'path');
+  pTot.setAttribute('id', 'p-tot'); pTot.setAttribute('fill', 'none');
+  pTot.setAttribute('stroke', '#d9a86c'); pTot.setAttribute('stroke-width', '2.2');
+  svg.appendChild(pTot);
+}
+buildPlotStatic();
+
+function updatePlot(res) {
+  const { xi1, xi2, xiTot } = res;
+  const path = (vals) => {
+    let d = '', started = false;
+    for (let i = 0; i < NBINS; i++) {
+      const v = vals[i];
+      if (!isFinite(v) || v <= 0) { started = false; continue; }
+      const x = px(Math.log10(rCent[i]));
+      const y = py(Math.log10(v));
+      d += (started ? 'L' : 'M') + x.toFixed(1) + ',' + y.toFixed(1);
+      started = true;
+    }
+    return d;
+  };
+  document.getElementById('p-1h').setAttribute('d', path(xi1));
+  document.getElementById('p-2h').setAttribute('d', path(xi2));
+  // For total, use max(xiTot, 0); convert to log
+  const totLog = xiTot.map(v => v > 0 ? v : 0);
+  document.getElementById('p-tot').setAttribute('d', path(totLog));
+}
+
+/* ==================================================================
+   Controls + state
+================================================================== */
+const $ = (id) => document.getElementById(id);
+const sliders = {
+  mmin: $('s-mmin'),
+  m1: $('s-m1'),
+  alpha: $('s-alpha'),
+};
+const vals = {
+  mmin: $('v-mmin'), m1: $('v-m1'), alpha: $('v-alpha'),
+};
+
+function readSliders() {
+  HOD.logMmin = parseFloat(sliders.mmin.value);
+  HOD.logM1   = parseFloat(sliders.m1.value);
+  HOD.alpha   = parseFloat(sliders.alpha.value);
+  vals.mmin.textContent = HOD.logMmin.toFixed(2);
+  vals.m1.textContent = HOD.logM1.toFixed(2);
+  vals.alpha.textContent = HOD.alpha.toFixed(2);
+}
+
+function setSliders(o) {
+  sliders.mmin.value = o.mmin;
+  sliders.m1.value = o.m1;
+  sliders.alpha.value = o.alpha;
+  readSliders();
+}
+
+function recompute() {
+  populate();
+  draw();
+  const res = computeCorrelation();
+  // averaged Ncen / Nsat
+  let sumC = 0, sumS = 0;
+  for (const h of halos) { sumC += Ncen(h.logMh); sumS += Nsat(h.logMh); }
+  const meanNcen = sumC / halos.length;
+  const meanNsat = sumS / halos.length;
+  // fsat
+  let nCen = 0, nSat = 0;
+  for (const h of halos) { if (h.cen) nCen++; nSat += h.sats.length; }
+  // Effective halo mass (weighted by total Ng)
+  let wMeff = 0, wTot = 0;
+  for (const h of halos) {
+    const w = Ncen(h.logMh) + Nsat(h.logMh);
+    wMeff += w * Math.pow(10, h.logMh);
+    wTot += w;
+  }
+  const logMeff = wTot > 0 ? Math.log10(wMeff / wTot) : 0;
+
+  $('r-ng').innerHTML = `<b>${nCen + nSat}</b>`;
+  $('r-fsat').innerHTML = `<b>${((nSat / Math.max(1, nCen + nSat)) * 100).toFixed(1)}%</b>`;
+  $('r-bias').innerHTML = `<b>${res.bias.toFixed(2)}</b>`;
+  $('r-ncen').textContent = meanNcen.toFixed(3);
+  $('r-nsat').textContent = meanNsat.toFixed(3);
+  $('r-meff').textContent = '10^' + logMeff.toFixed(2);
+
+  updatePlot(res);
+}
+
+let pending = false;
+function recomputeThrottled() {
+  if (pending) return;
+  pending = true;
+  requestAnimationFrame(() => { pending = false; recompute(); });
+}
+
+for (const s of Object.values(sliders)) {
+  s.addEventListener('input', () => { readSliders(); recomputeThrottled(); });
+}
+
+// Presets
+const PRESETS = {
+  lowz:  { mmin: 11.5, m1: 13.0, alpha: 1.00 },
+  midz:  { mmin: 11.9, m1: 13.2, alpha: 1.05 },
+  highz: { mmin: 10.9, m1: 12.2, alpha: 1.20 },
+  sat:   { mmin: 11.2, m1: 11.9, alpha: 1.35 },
+};
+document.querySelectorAll('.presets button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.presets button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    setSliders(PRESETS[btn.dataset.preset]);
+    recompute();
+  });
+});
+
+/* init */
+readSliders();
+resizeCanvas();
+recompute();
+
+/* zoom buttons */
+document.getElementById('zoom-in').addEventListener('click', () => { view.zoom = Math.min(MAX_ZOOM, view.zoom * 1.5); clampView(); draw(); });
+document.getElementById('zoom-out').addEventListener('click', () => { view.zoom = Math.max(MIN_ZOOM, view.zoom / 1.5); clampView(); draw(); });
+document.getElementById('zoom-reset').addEventListener('click', () => resetView());
+</script>
+</body>
+</html>
